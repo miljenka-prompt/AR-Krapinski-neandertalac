@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const video = $('storyVideo');
 const arVideo = $('arVideo');
 const cameraFeed = $('cameraFeed');
-const state = { stream: null, ar: false, x: 0, y: 0, scale: 1, dragging: false, dragX: 0, dragY: 0, startX: 0, startY: 0, pinchStart: null, pinchScale: 1 };
+const state = { stream: null, ar: false, x: 0, y: 0, scale: 1, dragging: false, dragX: 0, dragY: 0, startX: 0, startY: 0, pinchStart: null, pinchScale: 1, storyStarted: false };
 
 const icon = (button, name) => button.querySelector('use').setAttribute('href', `#i-${name}`);
 const timeText = (seconds) => `0:${String(Math.floor(Number.isFinite(seconds) ? seconds : 0)).padStart(2, '0')}`;
@@ -14,8 +14,12 @@ function updatePlayback(target = video, prefix = '') {
   icon(button, paused ? 'play' : 'pause');
   button.setAttribute('aria-label', paused ? (target.ended ? 'Ponovi prizor' : 'Pokreni prizor') : 'Pauziraj prizor');
   if (!prefix) {
-    $('bigPlay').hidden = !paused;
-    $('bigPlay').querySelector('span').textContent = target.ended ? 'Ponovi prizor' : target.currentTime > 0 ? 'Nastavi prizor' : 'Otvori vrijeme';
+    if (!state.storyStarted && paused && target.currentTime === 0) {
+      $('bigPlay').hidden = false;
+      $('bigPlay').querySelector('span').textContent = 'Otvori vrijeme';
+    } else {
+      $('bigPlay').hidden = true;
+    }
   }
 }
 
@@ -28,6 +32,7 @@ function updateTime() {
 
 async function play(target = video, fromStart = false) {
   if (fromStart || target.ended) target.currentTime = 0;
+  if (target === video) state.storyStarted = true;
   try { await target.play(); status(''); }
   catch (error) { if (!state.ar) status('Dodirnite tipku za reprodukciju da biste pokrenuli snimku.'); }
   updatePlayback(target, target === arVideo ? 'ar' : '');
@@ -44,7 +49,7 @@ function setMuted(target, muted) {
 
 $('playButton').addEventListener('click', () => toggle(video));
 $('bigPlay').addEventListener('click', () => toggle(video));
-$('replay').addEventListener('click', () => void play(video, true));
+$('replay').addEventListener('click', () => { state.storyStarted = true; void play(video, true); });
 $('soundButton').addEventListener('click', () => setMuted(video, !video.muted));
 $('seek').addEventListener('input', (event) => { video.currentTime = Number(event.target.value); updateTime(); });
 video.addEventListener('timeupdate', updateTime);
@@ -162,11 +167,3 @@ video.muted = true;
 arVideo.muted = true;
 updatePlayback(video);
 updatePlayback(arVideo,'ar');
-
-const spatialLink = document.createElement('a');
-spatialLink.className = 'secondary';
-spatialLink.href = './spatial-v2.html';
-spatialLink.textContent = 'Prostorni kronovizor';
-spatialLink.setAttribute('aria-label', 'Otvori krapinskog neandertalca usidrenog u prostoru');
-spatialLink.style.textDecoration = 'none';
-document.querySelector('.actions')?.appendChild(spatialLink);
