@@ -10,9 +10,29 @@ let maskVideo = null
 let figure = null
 let shadow = null
 let xrCamera = null
+let statusTimer = null
 
 const $ = (id) => document.getElementById(id)
-const setStatus = (text) => { const el = $('status'); if (el) el.textContent = text }
+
+function setStatus(text, autoHideMs = 0) {
+  const el = $('status')
+  const card = document.querySelector('.status-card')
+  if (!el || !card) return
+
+  if (statusTimer) {
+    clearTimeout(statusTimer)
+    statusTimer = null
+  }
+
+  el.textContent = text
+  card.classList.remove('is-hidden')
+
+  if (autoHideMs > 0) {
+    statusTimer = setTimeout(() => {
+      card.classList.add('is-hidden')
+    }, autoHideMs)
+  }
+}
 
 function makeVideo(src, muted = true) {
   const video = document.createElement('video')
@@ -145,17 +165,18 @@ function buildFigure(scene) {
     figure.geometry = new THREE.PlaneGeometry(width, targetHeight)
     shadow.geometry.dispose()
     shadow.geometry = new THREE.PlaneGeometry(Math.max(1.4, width * .55), .75)
-    setStatus('Prostorni prikaz spreman. Neandertalac je alpha-maskom izdvojen iz prizora i usidren u prostoru.')
+
+    setStatus('Pomakni se oko prizora. Ako izgubiš lik, dodirni “Ponovno usidri”.', 5200)
     playBoth().then(() => {
       $('video-toggle').textContent = 'Pauziraj prizor'
     }).catch(() => {
-      setStatus('Prostorni prikaz spreman. Dodirni “Pokreni prizor”.')
+      setStatus('Dodirni “Pokreni prizor”.', 4200)
     })
   }
 
   rgbVideo.addEventListener('loadedmetadata', () => { rgbReady = true; ready() })
   maskVideo.addEventListener('loadedmetadata', () => { maskReady = true; ready() })
-  const error = () => setStatus('Video ili alpha maska se nisu učitali. Osvježi stranicu i pokušaj ponovno.')
+  const error = () => setStatus('Prizor se nije učitao. Osvježi stranicu i pokušaj ponovno.')
   rgbVideo.addEventListener('error', error)
   maskVideo.addEventListener('error', error)
 }
@@ -169,7 +190,7 @@ const spatialModule = () => ({
     camera.position.set(0, 1.6, 2.5)
     XR8.XrController.updateCameraProjectionMatrix({origin: camera.position, facing: camera.quaternion})
     canvas.addEventListener('touchmove', (event) => event.preventDefault(), {passive: false})
-    setStatus('Tracking aktivan. Učitavam neandertalca i alpha masku…')
+    setStatus('Uspostavljam prostorni prikaz…')
   },
   onUpdate: () => {
     if (!figure || !xrCamera) return
@@ -196,7 +217,7 @@ function start() {
 
   $('recenter')?.addEventListener('click', () => {
     XR8.XrController.recenter()
-    setStatus('Neandertalac je ponovno usidren prema trenutačnoj poziciji kamere.')
+    setStatus('Prizor je ponovno usidren.', 2600)
   })
 
   $('video-toggle')?.addEventListener('click', async () => {
