@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#121b16">
   <meta name="description" content="WebAR rekonstrukcija nekadašnje polušpilje Hušnjakovo brdo u Krapini prije oko 125–130 tisuća godina, tijekom toplog posljednjeg interglacijala.">
   <title>Krapinski neandertalac · Kronovizor</title>
-  <link rel="stylesheet" href="./styles.css?v=2">
-  <script defer src="./app.js?v=2"></script>
+  <link rel="stylesheet" href="./styles.css?v=3">
+  <script defer src="./app.js?v=3"></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-defs" aria-hidden="true"><defs>
@@ -71,9 +71,15 @@
 
         <div class="actions">
           <button id="enterAR" class="primary" type="button"><svg><use href="#i-camera"/></svg><span>Otvori kameru</span></button>
+          <a id="spatialLink" class="secondary" href="./spatial-v2.html">Prostorni kronovizor</a>
           <button id="replay" class="secondary" type="button"><svg><use href="#i-reset"/></svg><span>Ponovi prizor</span></button>
         </div>
-        <p class="support-hint">Bez markera i bez instalacije. Kamera se uključuje tek nakon dodira tipke; vremenski prozor možete pomicati i povećavati.</p>
+        <div class="mode-guide" aria-label="Kako prijeći u prostorni prikaz">
+          <span class="guide-step">1 · Otvori kameru</span>
+          <span class="guide-arrow" aria-hidden="true">→</span>
+          <span class="guide-step">2 · Prostorni kronovizor</span>
+        </div>
+        <p class="support-hint"><strong>Za prostorni prikaz pritisnite „Prostorni kronovizor” nakon otvaranja kamere.</strong> Bez markera i bez instalacije; vremenski prozor možete pomicati i povećavati.</p>
         <p id="status" class="status" role="status" aria-live="polite"></p>
 
         <section id="aboutPanel" class="about-panel" aria-labelledby="aboutTitle">
@@ -111,7 +117,12 @@
       </div>
 
       <div class="ar-bottom">
-        <p id="arPrompt" class="ar-prompt">Pomaknite vremenski prozor prstom. Veličinu mijenjajte klizačem ili s dva prsta.</p>
+        <div class="ar-mode-switch">
+          <span>Vremenski prozor</span>
+          <span aria-hidden="true">→</span>
+          <a href="./spatial-v2.html">Prostorni kronovizor</a>
+        </div>
+        <p id="arPrompt" class="ar-prompt">Pomaknite vremenski prozor prstom. Za prostorni prikaz odaberite „Prostorni kronovizor”.</p>
         <div class="ar-controls">
           <button id="arPlay" class="icon-button" type="button" aria-label="Pokreni"><svg><use href="#i-play"/></svg></button>
           <button id="arReplay" class="icon-button" type="button" aria-label="Ponovi"><svg><use href="#i-reset"/></svg></button>
