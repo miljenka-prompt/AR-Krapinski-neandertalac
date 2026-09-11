@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111">
+  <title>Krapinski neandertalac · autorski legacy HIRO AR.js demo</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
+  <style>body{margin:0;overflow:hidden;background:#000}.legacy-label{position:fixed;z-index:10;left:10px;right:10px;top:10px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font:12px/1.35 system-ui,sans-serif;text-align:center;pointer-events:none}</style>
+</head>
+<body>
+  <div class="legacy-label">Autorski rad · Miljenka Ćurković · legacy AR.js + HIRO prototip</div>
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-assets>
+      <video id="neandertalac-video" src="Krapinski_neandertalac.mp4" preload="auto" autoplay loop muted playsinline webkit-playsinline></video>
+    </a-assets>
+    <a-marker preset="hiro">
+      <a-video src="#neandertalac-video" width="2" height="1.125" position="0 0.5 0" rotation="-90 0 0"></a-video>
+    </a-marker>
+    <a-entity camera></a-entity>
+  </a-scene>
+  <script>
+    const video=document.querySelector('#neandertalac-video');
+    const start=()=>{video.muted=true;video.play().catch(()=>{});};
+    video.addEventListener('canplay',start);video.addEventListener('loadeddata',start);window.addEventListener('load',start);document.addEventListener('click',start);document.addEventListener('touchstart',start,{once:true});
+  </script>
+</body>
+</html>
