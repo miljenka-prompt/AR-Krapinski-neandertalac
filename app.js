@@ -162,3 +162,13 @@ video.muted = true;
 arVideo.muted = true;
 updatePlayback(video);
 updatePlayback(arVideo,'ar');
+
+// Optional world-tracked mode. The original camera-overlay chronovisor stays intact;
+// this opens the proven 8th Wall + alpha-mask pipeline with the Krapina video.
+const spatialLink = document.createElement('a');
+spatialLink.className = 'secondary';
+spatialLink.href = 'https://miljenka-prompt.github.io/QInspired-WebAR-Tracking-Test/?subject=neanderthal';
+spatialLink.textContent = 'Prostorni kronovizor';
+spatialLink.setAttribute('aria-label', 'Otvori krapinskog neandertalca usidrenog u prostoru');
+spatialLink.style.textDecoration = 'none';
+document.querySelector('.actions')?.appendChild(spatialLink);
