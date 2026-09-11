@@ -8,19 +8,18 @@ const icon = (button, name) => button.querySelector('use').setAttribute('href', 
 const timeText = (seconds) => `0:${String(Math.floor(Number.isFinite(seconds) ? seconds : 0)).padStart(2, '0')}`;
 const status = (message = '') => { $('status').textContent = message; };
 
+function removeBigPlay() {
+  const bigPlay = $('bigPlay');
+  if (bigPlay) bigPlay.remove();
+}
+
 function updatePlayback(target = video, prefix = '') {
   const paused = target.paused || target.ended;
   const button = $(prefix ? 'arPlay' : 'playButton');
   icon(button, paused ? 'play' : 'pause');
   button.setAttribute('aria-label', paused ? (target.ended ? 'Ponovi prizor' : 'Pokreni prizor') : 'Pauziraj prizor');
-  if (!prefix) {
-    if (!state.storyStarted && paused && target.currentTime === 0) {
-      $('bigPlay').hidden = false;
-      $('bigPlay').querySelector('span').textContent = 'Otvori vrijeme';
-    } else {
-      $('bigPlay').hidden = true;
-    }
-  }
+
+  if (!prefix && state.storyStarted) removeBigPlay();
 }
 
 function updateTime() {
@@ -32,7 +31,10 @@ function updateTime() {
 
 async function play(target = video, fromStart = false) {
   if (fromStart || target.ended) target.currentTime = 0;
-  if (target === video) state.storyStarted = true;
+  if (target === video) {
+    state.storyStarted = true;
+    removeBigPlay();
+  }
   try { await target.play(); status(''); }
   catch (error) { if (!state.ar) status('Dodirnite tipku za reprodukciju da biste pokrenuli snimku.'); }
   updatePlayback(target, target === arVideo ? 'ar' : '');
@@ -48,8 +50,12 @@ function setMuted(target, muted) {
 }
 
 $('playButton').addEventListener('click', () => toggle(video));
-$('bigPlay').addEventListener('click', () => toggle(video));
-$('replay').addEventListener('click', () => { state.storyStarted = true; void play(video, true); });
+$('bigPlay')?.addEventListener('click', () => {
+  state.storyStarted = true;
+  removeBigPlay();
+  void play(video);
+});
+$('replay').addEventListener('click', () => { state.storyStarted = true; removeBigPlay(); void play(video, true); });
 $('soundButton').addEventListener('click', () => setMuted(video, !video.muted));
 $('seek').addEventListener('input', (event) => { video.currentTime = Number(event.target.value); updateTime(); });
 video.addEventListener('timeupdate', updateTime);
@@ -57,6 +63,10 @@ video.addEventListener('loadedmetadata', updateTime);
 ['play','pause','ended'].forEach((event) => video.addEventListener(event, () => updatePlayback(video)));
 video.addEventListener('waiting', () => { $('loading').hidden = false; });
 ['playing','canplay','pause','error'].forEach((event) => video.addEventListener(event, () => { $('loading').hidden = true; }));
+video.addEventListener('playing', () => {
+  state.storyStarted = true;
+  removeBigPlay();
+});
 video.addEventListener('error', () => status('Snimka se nije učitala. Pokušajte ponovno ili je otvorite zasebno.'));
 
 $('aboutButton').addEventListener('click', () => $('aboutPanel').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'}));
