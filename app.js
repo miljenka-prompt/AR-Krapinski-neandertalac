@@ -163,11 +163,9 @@ arVideo.muted = true;
 updatePlayback(video);
 updatePlayback(arVideo,'ar');
 
-// Optional world-tracked mode. The original camera-overlay chronovisor stays intact;
-// this opens the same alpha-mask spatial pipeline as a dedicated page in this repo.
 const spatialLink = document.createElement('a');
 spatialLink.className = 'secondary';
-spatialLink.href = './spatial.html';
+spatialLink.href = './spatial-v2.html';
 spatialLink.textContent = 'Prostorni kronovizor';
 spatialLink.setAttribute('aria-label', 'Otvori krapinskog neandertalca usidrenog u prostoru');
 spatialLink.style.textDecoration = 'none';
