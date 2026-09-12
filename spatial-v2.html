@@ -15,11 +15,11 @@
   <canvas id="camerafeed"></canvas>
   <div id="hud">
     <div class="top-row">
-      <a class="back" href="./" aria-label="Povratak na glavni kronovizor">← Kronovizor</a>
-      <div class="pill">KRAPINA · PROSTORNI KRONOVIZOR</div>
+      <a id="backLink" class="back" href="./" aria-label="Povratak na glavni kronovizor">← Kronovizor</a>
+      <div id="spatialTitle" class="pill">KRAPINA · PROSTORNI KRONOVIZOR</div>
     </div>
     <div class="status-card">
-      <strong>Hušnjakovo brdo · cca 125–130 ka</strong>
+      <strong id="siteLabel">Hušnjakovo brdo · cca 125–130 ka</strong>
       <div id="status">Uspostavljam prostorni prikaz…</div>
     </div>
     <div class="actions">
@@ -28,7 +28,6 @@
       <button id="sound-toggle" type="button" aria-pressed="false">Uključi zvuk</button>
     </div>
   </div>
-  <script type="module" src="./spatial-v2.js"></script>
-  <!-- deploy refresh 2026-09-12 -->
+  <script type="module" src="./spatial-v2.js?v=4"></script>
 </body>
 </html>
