@@ -2,6 +2,52 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.m
 
 window.THREE = THREE
 
+const params = new URLSearchParams(location.search)
+const lang = params.get('lang') === 'en' ? 'en' : 'hr'
+const mode = params.get('mode') === 'visitor' ? 'visitor' : 'scientific'
+localStorage.setItem('krapinaLang', lang)
+localStorage.setItem('krapinaMode', mode)
+
+document.documentElement.lang = lang
+
+const t = lang === 'en' ? {
+  title: 'KRAPINA · SPATIAL CHRONOVISOR',
+  site: 'Hušnjakovo Hill · c. 125–130 ka',
+  back: '← Chronovisor',
+  backAria: 'Back to the main chronovisor',
+  starting: 'Starting spatial view…',
+  ready: 'Move around the scene. If you lose the figure, tap “Re-anchor”.',
+  recenter: 'Re-anchor',
+  recentered: 'Scene re-anchored.',
+  play: 'Play scene',
+  pause: 'Pause scene',
+  soundOn: 'Turn sound on',
+  soundOff: 'Turn sound off',
+  tapPlay: 'Tap “Play scene”.',
+  blocked: 'The browser blocked playback. Tap the button again.',
+  error: 'The scene did not load. Refresh the page and try again.',
+  pageTitle: 'Krapina Neanderthal · Spatial chronovisor',
+} : {
+  title: 'KRAPINA · PROSTORNI KRONOVIZOR',
+  site: 'Hušnjakovo brdo · cca 125–130 ka',
+  back: '← Kronovizor',
+  backAria: 'Povratak na glavni kronovizor',
+  starting: 'Uspostavljam prostorni prikaz…',
+  ready: 'Pomakni se oko prizora. Ako izgubiš lik, dodirni “Ponovno usidri”.',
+  recenter: 'Ponovno usidri',
+  recentered: 'Prizor je ponovno usidren.',
+  play: 'Pokreni prizor',
+  pause: 'Pauziraj prizor',
+  soundOn: 'Uključi zvuk',
+  soundOff: 'Isključi zvuk',
+  tapPlay: 'Dodirni “Pokreni prizor”.',
+  blocked: 'Preglednik je blokirao reprodukciju. Dodirni tipku ponovno.',
+  error: 'Prizor se nije učitao. Osvježi stranicu i pokušaj ponovno.',
+  pageTitle: 'Krapinski neandertalac · Prostorni kronovizor',
+}
+
+document.title = t.pageTitle
+
 const VIDEO_URL = './Krapinski_neandertalac.mp4?v=20260912c'
 const MASK_URL = `/QInspired-WebAR-Tracking-Test/neanderthal-mask.mp4?rev=${Date.now()}`
 
@@ -13,6 +59,20 @@ let xrCamera = null
 let statusTimer = null
 
 const $ = (id) => document.getElementById(id)
+
+function localizeHud() {
+  const back = $('backLink')
+  if (back) {
+    back.textContent = t.back
+    back.setAttribute('aria-label', t.backAria)
+    back.href = `./?lang=${lang}&mode=${mode}`
+  }
+  if ($('spatialTitle')) $('spatialTitle').textContent = t.title
+  if ($('siteLabel')) $('siteLabel').textContent = t.site
+  if ($('recenter')) $('recenter').textContent = t.recenter
+  if ($('video-toggle')) $('video-toggle').textContent = t.play
+  if ($('sound-toggle')) $('sound-toggle').textContent = t.soundOn
+}
 
 function setStatus(text, autoHideMs = 0) {
   const el = $('status')
@@ -149,17 +209,17 @@ function buildFigure(scene) {
     shadow.geometry.dispose()
     shadow.geometry = new THREE.PlaneGeometry(Math.max(1.4, width * .55), .75)
 
-    setStatus('Pomakni se oko prizora. Ako izgubiš lik, dodirni “Ponovno usidri”.', 5200)
+    setStatus(t.ready, 5200)
     playBoth().then(() => {
-      $('video-toggle').textContent = 'Pauziraj prizor'
+      $('video-toggle').textContent = t.pause
     }).catch(() => {
-      setStatus('Dodirni “Pokreni prizor”.', 4200)
+      setStatus(t.tapPlay, 4200)
     })
   }
 
   rgbVideo.addEventListener('loadedmetadata', () => { rgbReady = true; ready() })
   maskVideo.addEventListener('loadedmetadata', () => { maskReady = true; ready() })
-  const error = () => setStatus('Prizor se nije učitao. Osvježi stranicu i pokušaj ponovno.')
+  const error = () => setStatus(t.error)
   rgbVideo.addEventListener('error', error)
   maskVideo.addEventListener('error', error)
 }
@@ -173,7 +233,7 @@ const spatialModule = () => ({
     camera.position.set(0, 1.6, 2.5)
     XR8.XrController.updateCameraProjectionMatrix({origin: camera.position, facing: camera.quaternion})
     canvas.addEventListener('touchmove', (event) => event.preventDefault(), {passive: false})
-    setStatus('Uspostavljam prostorni prikaz…')
+    setStatus(t.starting)
   },
   onUpdate: () => {
     if (!figure || !xrCamera) return
@@ -185,6 +245,8 @@ const spatialModule = () => ({
 })
 
 function start() {
+  localizeHud()
+
   XR8.addCameraPipelineModules([
     XR8.GlTextureRenderer.pipelineModule(),
     XR8.Threejs.pipelineModule(),
@@ -200,20 +262,20 @@ function start() {
 
   $('recenter')?.addEventListener('click', () => {
     XR8.XrController.recenter()
-    setStatus('Prizor je ponovno usidren.', 2600)
+    setStatus(t.recentered, 2600)
   })
 
   $('video-toggle')?.addEventListener('click', async () => {
     try {
       if (rgbVideo?.paused) {
         await playBoth()
-        $('video-toggle').textContent = 'Pauziraj prizor'
+        $('video-toggle').textContent = t.pause
       } else {
         pauseBoth()
-        $('video-toggle').textContent = 'Pokreni prizor'
+        $('video-toggle').textContent = t.play
       }
     } catch {
-      setStatus('Preglednik je blokirao reprodukciju. Dodirni tipku ponovno.')
+      setStatus(t.blocked)
     }
   })
 
@@ -221,9 +283,10 @@ function start() {
     if (!rgbVideo) return
     rgbVideo.muted = !rgbVideo.muted
     const on = !rgbVideo.muted
-    $('sound-toggle').textContent = on ? 'Isključi zvuk' : 'Uključi zvuk'
+    $('sound-toggle').textContent = on ? t.soundOff : t.soundOn
     $('sound-toggle').setAttribute('aria-pressed', String(on))
   })
 }
 
+localizeHud()
 window.XR8 ? start() : window.addEventListener('xrloaded', start)
