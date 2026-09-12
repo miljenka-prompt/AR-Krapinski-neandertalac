@@ -6,8 +6,9 @@
   <meta name="theme-color" content="#121b16">
   <meta name="description" content="WebAR rekonstrukcija nekadašnje polušpilje Hušnjakovo brdo u Krapini prije oko 125–130 tisuća godina, tijekom toplog posljednjeg interglacijala.">
   <title>Krapinski neandertalac · Kronovizor</title>
-  <link rel="stylesheet" href="./styles.css?v=4">
+  <link rel="stylesheet" href="./styles.css?v=5">
   <script defer src="./app.js?v=3"></script>
+  <script defer src="./krapina-ui.js?v=1"></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-defs" aria-hidden="true"><defs>
@@ -27,28 +28,37 @@
 
     <div id="page">
       <header class="topbar">
-        <a class="wordmark" href="./" aria-label="Kronovizor, početak">K<span>R</span>ONOVIZOR<span class="brand-line">KRAPINA</span></a>
-        <button id="aboutButton" class="quiet" type="button"><svg><use href="#i-info"/></svg><span>O rekonstrukciji</span></button>
+        <a class="wordmark" href="./" aria-label="Kronovizor, početak">K<span>R</span>ONOVIZOR<span class="brand-line" data-i18n="brand">KRAPINA</span></a>
+        <div class="top-actions">
+          <div class="switcher" role="group" aria-label="Language">
+            <button type="button" class="switch-btn is-active" data-lang="hr">HR</button>
+            <button type="button" class="switch-btn" data-lang="en">EN</button>
+          </div>
+          <button id="modeToggle" class="mode-toggle is-scientific" type="button" role="switch" aria-checked="true">
+            <span class="mode-track"><span class="mode-knob"></span></span>
+            <span id="modeLabel">Znanstvena verzija</span>
+          </button>
+          <button id="aboutButton" class="quiet" type="button"><svg><use href="#i-info"/></svg><span data-i18n="aboutButton">O rekonstrukciji</span></button>
+        </div>
       </header>
 
       <main>
         <section class="intro">
-          <p class="eyebrow">HUŠNJAKOVO BRDO · KRAPINA · POSLJEDNJI INTERGLACIJAL</p>
-          <h1>Prije oko <em>125–130 tisuća godina.</em></h1>
-          <p class="lead">Autorska rekonstrukcija nekadašnje polušpilje na Hušnjakovu brdu.</p>
-          <p class="context">Krapinski neandertalci živjeli su tijekom toplog interglacijalnog razdoblja. Ovaj WebAR prizor interpretira njihov boravak uz nekadašnju, danas urušenu polušpilju na Hušnjakovu brdu. Fauna nalazišta — među ostalim toplodobni nosorog, jeleni, goveda i medvjedi — pripada okolišu drukčijem od stereotipne slike neandertalca u snijegu.</p>
-          <p class="source-line"><strong>Autorski rad · Miljenka Ćurković</strong> · paleookolišna WebAR rekonstrukcija</p>
+          <p class="eyebrow" data-i18n="eyebrow">HUŠNJAKOVO BRDO · KRAPINA · POSLJEDNJI INTERGLACIJAL</p>
+          <h1 data-i18n-html="title">Prije oko <em>125–130 tisuća godina.</em></h1>
+          <p class="lead" data-i18n="lead">Autorska paleookolišna WebAR rekonstrukcija krapinskog neandertalskog lokaliteta.</p>
+          <p id="context" class="context"></p>
+          <p class="source-line"><strong>Miljenka Ćurković</strong> · <span data-i18n="sourceLine">paleookolišna interpretacija + WebAR</span></p>
         </section>
 
         <section class="viewer" aria-label="Rekonstrukcijski prizor">
           <div class="media-frame">
             <video id="storyVideo" playsinline webkit-playsinline preload="metadata" aria-label="Rekonstrukcijski prizor krapinskog neandertalca uz stijenski zaklon">
               <source src="./assets/krapina-neandertalac-15s.mp4?v=20260911" type="video/mp4">
-              Vaš preglednik ne može prikazati video. <a href="./assets/krapina-neandertalac-15s.mp4">Otvorite snimku.</a>
             </video>
-            <div class="frame-top"><span>HUŠNJAKOVO BRDO · cca 125–130 ka</span><span>AUTORSKA REKONSTRUKCIJA</span></div>
-            <button id="bigPlay" class="big-play" type="button" aria-label="Pokreni prizor"><svg><use href="#i-play"/></svg><span>Otvori vrijeme</span></button>
-            <div id="loading" class="loading" hidden>Učitavam prizor…</div>
+            <div class="frame-top"><span data-i18n="frameLeft">HUŠNJAKOVO BRDO · cca 125–130 ka</span><span data-i18n="frameRight">AUTORSKA REKONSTRUKCIJA</span></div>
+            <button id="bigPlay" class="big-play" type="button" aria-label="Pokreni prizor"><svg><use href="#i-play"/></svg><span data-i18n="openTime">Otvori vrijeme</span></button>
+            <div id="loading" class="loading" hidden data-i18n="loading">Učitavam prizor…</div>
           </div>
 
           <div class="playback">
@@ -62,50 +72,48 @@
         </section>
 
         <section class="interpretation" aria-label="Interpretacija prizora">
-          <p class="eyebrow">ŠTO GLEDAMO?</p>
-          <h2>Polušpilja Hušnjakovo u toplom interglacijalu</h2>
-          <p>Datiranje Krapine smješta lokalitet u posljednji interglacijal, približno u kasni MIS 5e. Prizor zato koristi zeleni, umjereni šumski okoliš, a ne glacijalnu tundru. Stijenski zaklon u videu vizualna je interpretacija nekadašnje polušpilje na Hušnjakovu brdu.</p>
-          <p>Neandertalac je prikazan pri obradi kamena uz stijenski zaklon. U pješčenjačkim naslagama nalazišta pronađeni su brojni neandertalski ostaci, pleistocenska fauna i više od tisuću kamenih artefakata.</p>
-          <div class="callout"><strong>Granica rekonstrukcije.</strong> Ovo je autorska rekonstrukcija lokaliteta i okoliša, a ne geometrijska rekonstrukcija točnog oblika nekadašnje polušpilje. Vegetacija, odjeća, izgled pojedinca, položaj predmeta i konkretan trenutak prikazani u videu interpretativni su. Zeleni okoliš oslanja se na interglacijalni kontekst nalazišta; video ne tvrdi da su pojedine prikazane biljne vrste potvrđene na Hušnjakovu. Vizualizacija je generirana alatom KlingAI na temelju autorskog opisa paleookolišnih parametara i prompta izvedenog iz muzejske i stručne literature. Zvuk je rekonstruiran u ElevenLabs. Odabir sadržaja, interpretacija i epistemološke ograde su autorske.</div>
+          <p class="eyebrow" data-i18n="whatEyebrow">ŠTO GLEDAMO?</p>
+          <h2 id="whatTitle"></h2>
+          <div id="interpretationCopy"></div>
         </section>
 
         <div class="actions">
-          <button id="enterAR" class="primary" type="button"><svg><use href="#i-camera"/></svg><span>Otvori kameru</span></button>
-          <a id="spatialLink" class="secondary" href="./spatial-v2.html">Prostorni kronovizor</a>
-          <button id="replay" class="secondary" type="button"><svg><use href="#i-reset"/></svg><span>Ponovi prizor</span></button>
+          <button id="enterAR" class="primary" type="button"><svg><use href="#i-camera"/></svg><span data-i18n="openCamera">Otvori kameru</span></button>
+          <a id="spatialLink" class="secondary" href="./spatial-v2.html" data-i18n="spatial">Prostorni kronovizor</a>
+          <button id="replay" class="secondary" type="button"><svg><use href="#i-reset"/></svg><span data-i18n="replay">Ponovi prizor</span></button>
         </div>
         <div class="mode-guide" aria-label="Kako prijeći u prostorni prikaz">
-          <span class="guide-step">1 · Otvori kameru</span>
+          <span class="guide-step" data-i18n="guide1">1 · Otvori kameru</span>
           <span class="guide-arrow" aria-hidden="true">→</span>
-          <span class="guide-step">2 · Prostorni kronovizor</span>
+          <span class="guide-step" data-i18n="guide2">2 · Prostorni kronovizor</span>
         </div>
-        <p class="support-hint"><strong>Za prostorni prikaz pritisnite „Prostorni kronovizor” nakon otvaranja kamere.</strong> Bez markera i bez instalacije; vremenski prozor možete pomicati i povećavati.</p>
+        <p class="support-hint" data-i18n-html="support"></p>
         <p id="status" class="status" role="status" aria-live="polite"></p>
 
-        <section id="aboutPanel" class="about-panel" aria-labelledby="aboutTitle">
-          <p class="eyebrow">IZA VREMENSKOG PROZORA</p>
-          <h2 id="aboutTitle">Što je dokumentirano, a što rekonstruirano?</h2>
-          <p><strong>Lokalitet.</strong> Nalazište krapinskih neandertalaca nalazi se na Hušnjakovu brdu. Muzejska dokumentacija opisuje nekadašnji izgled danas urušene krapinske polušpilje; arheološki i paleontološki nalazi potječu iz njezinih pješčenjačkih naslaga. Demo interpretira taj lokalitet kao živi prostor neandertalaca, bez tvrdnje da rekonstruira njegovu točnu nekadašnju geometriju.</p>
-          <p><strong>Vrijeme.</strong> Muzej krapinskih neandertalaca navodi starost nalazišta od oko 125.000 godina. Stručna literatura Krapinu datira približno na 130.000 godina odnosno kasni MIS 5e. U demonstraciji se zato koristi raspon 125–130 tisuća godina.</p>
-          <p><strong>Klima i fauna.</strong> Fauna i datiranje upućuju na toplo interglacijalno razdoblje. Na lokalitetu su zabilježeni brojni pleistocenski sisavci, uključujući toplodobnog nosoroga, medvjede, goveda, jelene i dabrove.</p>
-          <p><strong>Vizualizacija.</strong> Prizor nije fotografska rekonstrukcija jednog točno dokumentiranog dana. To je paleookolišno utemeljena interpretacija namijenjena demonstraciji kako se nalaz i znanstveni kontekst mogu prevesti u mobilno WebAR iskustvo.</p>
-          <div class="sources">
-            <a href="https://mkn.mhz.hr/hr/o-muzeju/nalaziste/" target="_blank" rel="noopener noreferrer">Muzej krapinskih neandertalaca · nalazište ↗</a>
-            <a href="https://mkn.mhz.hr/hr/o-muzeju/arhitektura/" target="_blank" rel="noopener noreferrer">MKN · nekadašnja polušpilja i lokalitet ↗</a>
-            <a href="https://doi.org/10.1038/378024a0" target="_blank" rel="noopener noreferrer">Rink et al. 1995 · ESR datiranje Krapine ↗</a>
-            <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0119802" target="_blank" rel="noopener noreferrer">Radovčić et al. 2015 · orlovske kandže kao nakit ↗</a>
+        <section id="aboutPanel" class="about-panel">
+          <p class="eyebrow" data-i18n="behindEyebrow">IZA VREMENSKOG PROZORA</p>
+          <h2 id="behindTitle"></h2>
+          <div id="aboutCopy"></div>
+          <div id="referenceBlock" class="references-wrap">
+            <p class="reference-heading" data-i18n="references">Reference</p>
+            <div class="sources">
+              <a href="https://mkn.mhz.hr/hr/o-muzeju/nalaziste/" target="_blank" rel="noopener noreferrer">Muzej krapinskih neandertalaca · nalazište ↗</a>
+              <a href="https://mkn.mhz.hr/hr/o-muzeju/arhitektura/" target="_blank" rel="noopener noreferrer">MKN · nekadašnja polušpilja i lokalitet ↗</a>
+              <a href="https://doi.org/10.1038/378024a0" target="_blank" rel="noopener noreferrer">Rink et al. 1995 · ESR dating ↗</a>
+              <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0119802" target="_blank" rel="noopener noreferrer">Radovčić et al. 2015 · eagle talons ↗</a>
+            </div>
           </div>
-          <p class="detail-note">Koncept, interpretacija i WebAR demonstracija · neovisni autorski projekt.</p>
-          <p class="detail-note"><a href="./legacy-hiro.html">Raniji AR.js / HIRO prototip ↗</a></p>
+          <p id="dossierNote" class="detail-note"></p>
+          <p class="detail-note"><a href="./legacy-hiro.html" data-i18n="legacy">Raniji AR.js / HIRO prototip ↗</a></p>
         </section>
       </main>
 
-      <footer><span>Autorski WebAR rad · Miljenka Ćurković</span><span>Rekonstrukcija lokaliteta Hušnjakovo</span></footer>
+      <footer><span data-i18n="footer1">Autorski WebAR rad · Miljenka Ćurković</span><span data-i18n="footer2">Rekonstrukcija lokaliteta Hušnjakovo</span></footer>
     </div>
 
     <div id="arMode" class="ar-mode" hidden>
       <div class="ar-top">
-        <div><span class="eyebrow">AUTORSKA REKONSTRUKCIJA</span><p>Hušnjakovo brdo · prozor u posljednji interglacijal</p></div>
+        <div><span class="eyebrow" data-i18n="frameRight">AUTORSKA REKONSTRUKCIJA</span><p data-i18n="arTitle">Hušnjakovo brdo · prozor u posljednji interglacijal</p></div>
         <button id="exitAR" class="icon-button ar-close" type="button" aria-label="Zatvori kameru"><svg><use href="#i-close"/></svg></button>
       </div>
 
@@ -113,21 +121,21 @@
         <video id="arVideo" playsinline webkit-playsinline preload="metadata" muted>
           <source src="./assets/krapina-neandertalac-15s.mp4?v=20260911" type="video/mp4">
         </video>
-        <span class="portal-label">HUŠNJAKOVO BRDO · KRAPINA · cca 125–130 ka</span>
+        <span class="portal-label" data-i18n="frameLeft">HUŠNJAKOVO BRDO · cca 125–130 ka</span>
       </div>
 
       <div class="ar-bottom">
         <div class="ar-mode-switch">
-          <span>Vremenski prozor</span>
+          <span data-i18n="timeWindow">Vremenski prozor</span>
           <span aria-hidden="true">→</span>
-          <a href="./spatial-v2.html">Prostorni kronovizor</a>
+          <a id="arSpatialLink" href="./spatial-v2.html" data-i18n="spatial">Prostorni kronovizor</a>
         </div>
-        <p id="arPrompt" class="ar-prompt">Pomaknite vremenski prozor prstom. Za prostorni prikaz odaberite „Prostorni kronovizor”.</p>
+        <p id="arPrompt" class="ar-prompt" data-i18n="arPrompt">Pomaknite vremenski prozor prstom. Za prostorni prikaz odaberite „Prostorni kronovizor”.</p>
         <div class="ar-controls">
           <button id="arPlay" class="icon-button" type="button" aria-label="Pokreni"><svg><use href="#i-play"/></svg></button>
           <button id="arReplay" class="icon-button" type="button" aria-label="Ponovi"><svg><use href="#i-reset"/></svg></button>
           <button id="arSound" class="icon-button" type="button" aria-label="Uključi zvuk" aria-pressed="false"><svg><use href="#i-mute"/></svg></button>
-          <label class="scale-control">Veličina<input id="portalScale" type="range" min="0.55" max="1.45" step="0.05" value="1"></label>
+          <label class="scale-control"><span data-i18n="size">Veličina</span><input id="portalScale" type="range" min="0.55" max="1.45" step="0.05" value="1"></label>
         </div>
       </div>
     </div>
