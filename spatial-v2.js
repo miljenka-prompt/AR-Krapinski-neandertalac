@@ -3,7 +3,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.m
 window.THREE = THREE
 
 const VIDEO_URL = './assets/krapina-neandertalac-15s.mp4?v=20260911'
-const MASK_URL = '/QInspired-WebAR-Tracking-Test/neanderthal-mask.mp4'
+const MASK_URL = '/QInspired-WebAR-Tracking-Test/neanderthal-mask.mp4?v=20260912b'
 
 let rgbVideo = null
 let maskVideo = null
@@ -58,8 +58,8 @@ function alphaMaterial(rgbMap, maskMap) {
     uniforms: {
       rgbMap: {value: rgbMap},
       maskMap: {value: maskMap},
-      alphaGain: {value: 1.15},
-      alphaFloor: {value: 0.08},
+      alphaGain: {value: 1.22},
+      alphaFloor: {value: 0.045},
     },
     vertexShader: `
       varying vec2 vUv;
@@ -78,7 +78,7 @@ function alphaMaterial(rgbMap, maskMap) {
         vec4 rgb = texture2D(rgbMap, vUv);
         float m = texture2D(maskMap, vUv).r;
         float a = smoothstep(alphaFloor, 1.0, m * alphaGain);
-        if (a < 0.015) discard;
+        if (a < 0.01) discard;
         gl_FragColor = vec4(rgb.rgb, a);
       }
     `,
@@ -91,7 +91,7 @@ function alphaMaterial(rgbMap, maskMap) {
 
 function syncVideos() {
   if (!rgbVideo || !maskVideo) return
-  if (Math.abs(rgbVideo.currentTime - maskVideo.currentTime) > 0.08) {
+  if (Math.abs(rgbVideo.currentTime - maskVideo.currentTime) > 0.035) {
     maskVideo.currentTime = rgbVideo.currentTime
   }
 }
