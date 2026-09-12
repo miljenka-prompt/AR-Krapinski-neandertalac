@@ -3,7 +3,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.m
 window.THREE = THREE
 
 const VIDEO_URL = './Krapinski_neandertalac.mp4?v=20260912c'
-const MASK_URL = '/QInspired-WebAR-Tracking-Test/neanderthal-mask.mp4?v=20260912c'
+const MASK_URL = `/QInspired-WebAR-Tracking-Test/neanderthal-mask.mp4?rev=${Date.now()}`
 
 let rgbVideo = null
 let maskVideo = null
