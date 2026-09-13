@@ -81,9 +81,7 @@ function setStatus(text, autoHideMs = 0) {
   if (statusTimer) clearTimeout(statusTimer)
   el.textContent = text
   card.classList.remove('is-hidden')
-  if (autoHideMs > 0) {
-    statusTimer = setTimeout(() => card.classList.add('is-hidden'), autoHideMs)
-  }
+  if (autoHideMs > 0) statusTimer = setTimeout(() => card.classList.add('is-hidden'), autoHideMs)
 }
 
 function makeVideo(src, muted = true) {
@@ -111,6 +109,87 @@ function softShadowTexture() {
   ctx.fillStyle = g
   ctx.fillRect(0, 0, 256, 128)
   return new THREE.CanvasTexture(canvas)
+}
+
+function irregularPatchGeometry(rx = 1.45, rz = 1.05) {
+  const shape = new THREE.Shape()
+  const pts = [
+    [-1.00, 0.02], [-0.76, 0.55], [-0.30, 0.77], [0.25, 0.70],
+    [0.82, 0.42], [1.00, -0.06], [0.72, -0.54], [0.18, -0.76],
+    [-0.42, -0.70], [-0.88, -0.38],
+  ]
+  pts.forEach(([x, z], i) => {
+    const px = x * rx
+    const pz = z * rz
+    if (i === 0) shape.moveTo(px, pz)
+    else shape.lineTo(px, pz)
+  })
+  shape.closePath()
+  return new THREE.ShapeGeometry(shape)
+}
+
+function buildEnvironment(scene) {
+  const env = new THREE.Group()
+  env.position.set(0, 0, -1.5)
+
+  const ground = new THREE.Mesh(
+    irregularPatchGeometry(1.6, 1.08),
+    new THREE.MeshStandardMaterial({color: 0x7f6a50, roughness: 1, metalness: 0, transparent: true, opacity: 0.9})
+  )
+  ground.rotation.x = -Math.PI / 2
+  ground.position.y = 0.004
+  env.add(ground)
+
+  const hearth = new THREE.Mesh(
+    new THREE.CircleGeometry(0.28, 28),
+    new THREE.MeshStandardMaterial({color: 0x3f342b, roughness: 1, transparent: true, opacity: 0.72})
+  )
+  hearth.rotation.x = -Math.PI / 2
+  hearth.scale.set(1.2, 0.72, 1)
+  hearth.position.set(0.72, 0.011, 0.2)
+  env.add(hearth)
+
+  const stoneMat = new THREE.MeshStandardMaterial({color: 0x8d8171, roughness: 1, flatShading: true})
+  ;[
+    [0.50, 0.055, 0.16, 0.08], [0.62, 0.05, 0.38, 0.075],
+    [0.82, 0.05, 0.38, 0.072], [0.94, 0.052, 0.18, 0.078],
+    [0.88, 0.05, -0.03, 0.07], [0.65, 0.05, -0.06, 0.075],
+  ].forEach(([x, y, z, s], i) => {
+    const stone = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), stoneMat)
+    stone.scale.y = 0.62
+    stone.rotation.y = i * 0.55
+    stone.position.set(x, y, z)
+    env.add(stone)
+  })
+
+  const workStone = new THREE.Mesh(
+    new THREE.DodecahedronGeometry(0.24, 0),
+    new THREE.MeshStandardMaterial({color: 0x766b5e, roughness: 1, flatShading: true})
+  )
+  workStone.scale.set(1.35, 0.55, 1.0)
+  workStone.position.set(-0.48, 0.13, 0.36)
+  workStone.rotation.y = -0.45
+  env.add(workStone)
+
+  const flintMat = new THREE.MeshStandardMaterial({color: 0x51483e, roughness: 0.78, metalness: 0.02, flatShading: true})
+  ;[
+    [-0.18, 0.035, 0.34, 0.055], [-0.06, 0.035, 0.46, 0.045],
+    [-0.30, 0.035, 0.52, 0.05], [0.04, 0.035, 0.28, 0.042],
+    [-0.38, 0.035, 0.20, 0.048],
+  ].forEach(([x, y, z, s], i) => {
+    const flake = new THREE.Mesh(new THREE.TetrahedronGeometry(s, 0), flintMat)
+    flake.scale.set(1.65, 0.42, 0.78)
+    flake.rotation.set(0.2, i * 0.78, 0.16)
+    flake.position.set(x, y, z)
+    env.add(flake)
+  })
+
+  const rawCore = new THREE.Mesh(new THREE.IcosahedronGeometry(0.095, 0), flintMat)
+  rawCore.scale.set(1.1, 0.8, 0.95)
+  rawCore.position.set(-0.63, 0.08, 0.08)
+  env.add(rawCore)
+
+  scene.add(env)
 }
 
 function alphaMaterial(rgbMap, maskMap) {
@@ -151,9 +230,7 @@ function alphaMaterial(rgbMap, maskMap) {
 
 function syncVideos() {
   if (!rgbVideo || !maskVideo) return
-  if (Math.abs(rgbVideo.currentTime - maskVideo.currentTime) > 0.035) {
-    maskVideo.currentTime = rgbVideo.currentTime
-  }
+  if (Math.abs(rgbVideo.currentTime - maskVideo.currentTime) > 0.035) maskVideo.currentTime = rgbVideo.currentTime
 }
 
 async function playBoth() {
@@ -195,7 +272,8 @@ function buildFigure(scene) {
     new THREE.MeshBasicMaterial({map: softShadowTexture(), transparent: true, depthWrite: false, toneMapped: false})
   )
   shadow.rotation.x = -Math.PI / 2
-  shadow.position.set(0, .012, -1.5)
+  shadow.position.set(0, .018, -1.5)
+  shadow.renderOrder = 1
   scene.add(shadow)
 
   let rgbReady = false
@@ -225,10 +303,15 @@ function buildFigure(scene) {
 }
 
 const spatialModule = () => ({
-  name: 'krapina-spatial-chronovisor-v2',
+  name: 'krapina-spatial-chronovisor-v3',
   onStart: ({canvas}) => {
     const {scene, camera} = XR8.Threejs.xrScene()
     xrCamera = camera
+    scene.add(new THREE.HemisphereLight(0xe5e1d8, 0x4d4033, 1.25))
+    const sun = new THREE.DirectionalLight(0xfff1da, 0.68)
+    sun.position.set(-2, 4, 2)
+    scene.add(sun)
+    buildEnvironment(scene)
     buildFigure(scene)
     camera.position.set(0, 1.6, 2.5)
     XR8.XrController.updateCameraProjectionMatrix({origin: camera.position, facing: camera.quaternion})
