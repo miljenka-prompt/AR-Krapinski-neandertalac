@@ -48,11 +48,9 @@ const t = lang === 'en' ? {
 
 document.title = t.pageTitle
 
-const VIDEO_URL = './Krapinski_neandertalac.mp4?v=20260912c'
-const MASK_URL = `/QInspired-WebAR-Tracking-Test/neanderthal-mask.mp4?rev=${Date.now()}`
+const PACKED_URL = `/QInspired-WebAR-Tracking-Test/neanderthal-packed.mp4?rev=20260913-frame-lock-1`
 
-let rgbVideo = null
-let maskVideo = null
+let packedVideo = null
 let figure = null
 let shadow = null
 let xrCamera = null
@@ -81,9 +79,7 @@ function setStatus(text, autoHideMs = 0) {
   if (statusTimer) clearTimeout(statusTimer)
   el.textContent = text
   card.classList.remove('is-hidden')
-  if (autoHideMs > 0) {
-    statusTimer = setTimeout(() => card.classList.add('is-hidden'), autoHideMs)
-  }
+  if (autoHideMs > 0) statusTimer = setTimeout(() => card.classList.add('is-hidden'), autoHideMs)
 }
 
 function makeVideo(src, muted = true) {
@@ -113,11 +109,10 @@ function softShadowTexture() {
   return new THREE.CanvasTexture(canvas)
 }
 
-function alphaMaterial(rgbMap, maskMap) {
+function packedAlphaMaterial(packedMap) {
   return new THREE.ShaderMaterial({
     uniforms: {
-      rgbMap: {value: rgbMap},
-      maskMap: {value: maskMap},
+      packedMap: {value: packedMap},
       alphaGain: {value: 1.22},
       alphaFloor: {value: 0.045},
     },
@@ -129,14 +124,15 @@ function alphaMaterial(rgbMap, maskMap) {
       }
     `,
     fragmentShader: `
-      uniform sampler2D rgbMap;
-      uniform sampler2D maskMap;
+      uniform sampler2D packedMap;
       uniform float alphaGain;
       uniform float alphaFloor;
       varying vec2 vUv;
       void main(){
-        vec4 rgb = texture2D(rgbMap, vUv);
-        float m = texture2D(maskMap, vUv).r;
+        vec2 rgbUv = vec2(vUv.x * 0.5, vUv.y);
+        vec2 maskUv = vec2(0.5 + vUv.x * 0.5, vUv.y);
+        vec4 rgb = texture2D(packedMap, rgbUv);
+        float m = texture2D(packedMap, maskUv).r;
         float a = smoothstep(alphaFloor, 1.0, m * alphaGain);
         if (a < 0.01) discard;
         gl_FragColor = vec4(rgb.rgb, a);
@@ -149,43 +145,27 @@ function alphaMaterial(rgbMap, maskMap) {
   })
 }
 
-function syncVideos() {
-  if (!rgbVideo || !maskVideo) return
-  if (Math.abs(rgbVideo.currentTime - maskVideo.currentTime) > 0.035) {
-    maskVideo.currentTime = rgbVideo.currentTime
-  }
-}
-
-async function playBoth() {
-  if (!rgbVideo || !maskVideo) return false
-  maskVideo.currentTime = rgbVideo.currentTime
-  await Promise.all([rgbVideo.play(), maskVideo.play()])
+async function playScene() {
+  if (!packedVideo) return false
+  await packedVideo.play()
   return true
 }
 
-function pauseBoth() {
-  rgbVideo?.pause()
-  maskVideo?.pause()
+function pauseScene() {
+  packedVideo?.pause()
 }
 
 function buildFigure(scene) {
-  rgbVideo = makeVideo(VIDEO_URL, true)
-  maskVideo = makeVideo(MASK_URL, true)
+  packedVideo = makeVideo(PACKED_URL, true)
 
-  const rgbTexture = new THREE.VideoTexture(rgbVideo)
-  rgbTexture.colorSpace = THREE.SRGBColorSpace
-  rgbTexture.minFilter = THREE.LinearFilter
-  rgbTexture.magFilter = THREE.LinearFilter
-  rgbTexture.generateMipmaps = false
-
-  const maskTexture = new THREE.VideoTexture(maskVideo)
-  maskTexture.colorSpace = THREE.NoColorSpace
-  maskTexture.minFilter = THREE.LinearFilter
-  maskTexture.magFilter = THREE.LinearFilter
-  maskTexture.generateMipmaps = false
+  const packedTexture = new THREE.VideoTexture(packedVideo)
+  packedTexture.colorSpace = THREE.SRGBColorSpace
+  packedTexture.minFilter = THREE.LinearFilter
+  packedTexture.magFilter = THREE.LinearFilter
+  packedTexture.generateMipmaps = false
 
   const targetHeight = 1.75
-  figure = new THREE.Mesh(new THREE.PlaneGeometry(3.1, targetHeight), alphaMaterial(rgbTexture, maskTexture))
+  figure = new THREE.Mesh(new THREE.PlaneGeometry(3.1, targetHeight), packedAlphaMaterial(packedTexture))
   figure.position.set(0, targetHeight / 2, -1.5)
   figure.renderOrder = 2
   scene.add(figure)
@@ -198,34 +178,27 @@ function buildFigure(scene) {
   shadow.position.set(0, .012, -1.5)
   scene.add(shadow)
 
-  let rgbReady = false
-  let maskReady = false
-  const ready = () => {
-    if (!rgbReady || !maskReady) return
-    const aspect = rgbVideo.videoWidth / rgbVideo.videoHeight
-    const width = targetHeight * aspect
+  packedVideo.addEventListener('loadedmetadata', () => {
+    const sourceAspect = (packedVideo.videoWidth * 0.5) / packedVideo.videoHeight
+    const width = targetHeight * sourceAspect
     figure.geometry.dispose()
     figure.geometry = new THREE.PlaneGeometry(width, targetHeight)
     shadow.geometry.dispose()
     shadow.geometry = new THREE.PlaneGeometry(Math.max(1.4, width * .55), .75)
 
     setStatus(t.ready, 5200)
-    playBoth().then(() => {
+    playScene().then(() => {
       $('video-toggle').textContent = t.pause
     }).catch(() => {
       setStatus(t.tapPlay, 4200)
     })
-  }
+  })
 
-  rgbVideo.addEventListener('loadedmetadata', () => { rgbReady = true; ready() })
-  maskVideo.addEventListener('loadedmetadata', () => { maskReady = true; ready() })
-  const error = () => setStatus(t.error)
-  rgbVideo.addEventListener('error', error)
-  maskVideo.addEventListener('error', error)
+  packedVideo.addEventListener('error', () => setStatus(t.error))
 }
 
 const spatialModule = () => ({
-  name: 'krapina-spatial-chronovisor-v2',
+  name: 'krapina-spatial-chronovisor-v3-frame-locked',
   onStart: ({canvas}) => {
     const {scene, camera} = XR8.Threejs.xrScene()
     xrCamera = camera
@@ -237,7 +210,6 @@ const spatialModule = () => ({
   },
   onUpdate: () => {
     if (!figure || !xrCamera) return
-    syncVideos()
     const dx = xrCamera.position.x - figure.position.x
     const dz = xrCamera.position.z - figure.position.z
     figure.rotation.y = Math.atan2(dx, dz)
@@ -267,11 +239,11 @@ function start() {
 
   $('video-toggle')?.addEventListener('click', async () => {
     try {
-      if (rgbVideo?.paused) {
-        await playBoth()
+      if (packedVideo?.paused) {
+        await playScene()
         $('video-toggle').textContent = t.pause
       } else {
-        pauseBoth()
+        pauseScene()
         $('video-toggle').textContent = t.play
       }
     } catch {
@@ -280,9 +252,9 @@ function start() {
   })
 
   $('sound-toggle')?.addEventListener('click', () => {
-    if (!rgbVideo) return
-    rgbVideo.muted = !rgbVideo.muted
-    const on = !rgbVideo.muted
+    if (!packedVideo) return
+    packedVideo.muted = !packedVideo.muted
+    const on = !packedVideo.muted
     $('sound-toggle').textContent = on ? t.soundOff : t.soundOn
     $('sound-toggle').setAttribute('aria-pressed', String(on))
   })
