@@ -81,7 +81,9 @@ function setStatus(text, autoHideMs = 0) {
   if (statusTimer) clearTimeout(statusTimer)
   el.textContent = text
   card.classList.remove('is-hidden')
-  if (autoHideMs > 0) statusTimer = setTimeout(() => card.classList.add('is-hidden'), autoHideMs)
+  if (autoHideMs > 0) {
+    statusTimer = setTimeout(() => card.classList.add('is-hidden'), autoHideMs)
+  }
 }
 
 function makeVideo(src, muted = true) {
@@ -109,97 +111,6 @@ function softShadowTexture() {
   ctx.fillStyle = g
   ctx.fillRect(0, 0, 256, 128)
   return new THREE.CanvasTexture(canvas)
-}
-
-function earthTraceTexture() {
-  const canvas = document.createElement('canvas')
-  canvas.width = 512
-  canvas.height = 512
-  const ctx = canvas.getContext('2d')
-  const g = ctx.createRadialGradient(256, 256, 35, 256, 256, 248)
-  g.addColorStop(0, 'rgba(92,70,48,.24)')
-  g.addColorStop(.48, 'rgba(104,79,55,.14)')
-  g.addColorStop(.78, 'rgba(112,87,61,.06)')
-  g.addColorStop(1, 'rgba(112,87,61,0)')
-  ctx.fillStyle = g
-  ctx.fillRect(0, 0, 512, 512)
-  for (let i = 0; i < 210; i++) {
-    const x = Math.random() * 512
-    const y = Math.random() * 512
-    const r = .4 + Math.random() * 2.1
-    ctx.fillStyle = `rgba(50,40,31,${0.012 + Math.random() * .025})`
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill()
-  }
-  return new THREE.CanvasTexture(canvas)
-}
-
-function hearthTraceTexture() {
-  const canvas = document.createElement('canvas')
-  canvas.width = 256
-  canvas.height = 256
-  const ctx = canvas.getContext('2d')
-  const g = ctx.createRadialGradient(128, 128, 8, 128, 128, 118)
-  g.addColorStop(0, 'rgba(46,37,31,.30)')
-  g.addColorStop(.55, 'rgba(59,47,38,.14)')
-  g.addColorStop(1, 'rgba(59,47,38,0)')
-  ctx.fillStyle = g
-  ctx.fillRect(0, 0, 256, 256)
-  return new THREE.CanvasTexture(canvas)
-}
-
-function buildEnvironment(scene) {
-  const env = new THREE.Group()
-  env.position.set(0, 0, -1.5)
-
-  const earth = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.55, 1.65),
-    new THREE.MeshBasicMaterial({map: earthTraceTexture(), transparent: true, depthWrite: false, toneMapped: false})
-  )
-  earth.rotation.x = -Math.PI / 2
-  earth.position.y = .006
-  env.add(earth)
-
-  const hearth = new THREE.Mesh(
-    new THREE.PlaneGeometry(.62, .42),
-    new THREE.MeshBasicMaterial({map: hearthTraceTexture(), transparent: true, depthWrite: false, toneMapped: false})
-  )
-  hearth.rotation.x = -Math.PI / 2
-  hearth.position.set(.68, .009, .18)
-  hearth.rotation.z = .12
-  env.add(hearth)
-
-  const stoneMat = new THREE.MeshStandardMaterial({color: 0x777168, roughness: 1, metalness: 0})
-  ;[
-    [.54, .027, .10, .045, 1.25, .52],
-    [.76, .025, .26, .04, 1.1, .48],
-    [.88, .023, .08, .036, 1.35, .45],
-  ].forEach(([x, y, z, s, sx, sy], i) => {
-    const stone = new THREE.Mesh(new THREE.SphereGeometry(s, 12, 8), stoneMat)
-    stone.scale.set(sx, sy, .9)
-    stone.rotation.y = i * .7
-    stone.position.set(x, y, z)
-    env.add(stone)
-  })
-
-  const flintMat = new THREE.MeshStandardMaterial({color: 0x4d4842, roughness: .82, metalness: 0})
-  ;[
-    [-.23, .018, .26, .030], [-.08, .017, .38, .025],
-    [-.31, .017, .44, .026], [.02, .017, .25, .022],
-    [-.40, .017, .18, .024],
-  ].forEach(([x, y, z, s], i) => {
-    const flake = new THREE.Mesh(new THREE.TetrahedronGeometry(s, 0), flintMat)
-    flake.scale.set(1.7, .28, .7)
-    flake.rotation.set(.08, i * .77, .12)
-    flake.position.set(x, y, z)
-    env.add(flake)
-  })
-
-  const core = new THREE.Mesh(new THREE.SphereGeometry(.055, 10, 7), flintMat)
-  core.scale.set(1.2, .75, .95)
-  core.position.set(-.52, .038, .12)
-  env.add(core)
-
-  scene.add(env)
 }
 
 function alphaMaterial(rgbMap, maskMap) {
@@ -240,7 +151,9 @@ function alphaMaterial(rgbMap, maskMap) {
 
 function syncVideos() {
   if (!rgbVideo || !maskVideo) return
-  if (Math.abs(rgbVideo.currentTime - maskVideo.currentTime) > 0.035) maskVideo.currentTime = rgbVideo.currentTime
+  if (Math.abs(rgbVideo.currentTime - maskVideo.currentTime) > 0.035) {
+    maskVideo.currentTime = rgbVideo.currentTime
+  }
 }
 
 async function playBoth() {
@@ -313,15 +226,10 @@ function buildFigure(scene) {
 }
 
 const spatialModule = () => ({
-  name: 'krapina-spatial-chronovisor-v4',
+  name: 'krapina-spatial-chronovisor-v2',
   onStart: ({canvas}) => {
     const {scene, camera} = XR8.Threejs.xrScene()
     xrCamera = camera
-    scene.add(new THREE.HemisphereLight(0xe5e1d8, 0x4d4033, 1.05))
-    const sun = new THREE.DirectionalLight(0xfff1da, 0.5)
-    sun.position.set(-2, 4, 2)
-    scene.add(sun)
-    buildEnvironment(scene)
     buildFigure(scene)
     camera.position.set(0, 1.6, 2.5)
     XR8.XrController.updateCameraProjectionMatrix({origin: camera.position, facing: camera.quaternion})
