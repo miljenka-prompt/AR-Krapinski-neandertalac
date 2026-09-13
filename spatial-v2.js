@@ -195,8 +195,7 @@ function buildFigure(scene) {
     new THREE.MeshBasicMaterial({map: softShadowTexture(), transparent: true, depthWrite: false, toneMapped: false})
   )
   shadow.rotation.x = -Math.PI / 2
-  shadow.position.set(0, .018, -1.5)
-  shadow.renderOrder = 1
+  shadow.position.set(0, .012, -1.5)
   scene.add(shadow)
 
   let rgbReady = false
