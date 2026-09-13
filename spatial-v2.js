@@ -111,83 +111,93 @@ function softShadowTexture() {
   return new THREE.CanvasTexture(canvas)
 }
 
-function irregularPatchGeometry(rx = 1.45, rz = 1.05) {
-  const shape = new THREE.Shape()
-  const pts = [
-    [-1.00, 0.02], [-0.76, 0.55], [-0.30, 0.77], [0.25, 0.70],
-    [0.82, 0.42], [1.00, -0.06], [0.72, -0.54], [0.18, -0.76],
-    [-0.42, -0.70], [-0.88, -0.38],
-  ]
-  pts.forEach(([x, z], i) => {
-    const px = x * rx
-    const pz = z * rz
-    if (i === 0) shape.moveTo(px, pz)
-    else shape.lineTo(px, pz)
-  })
-  shape.closePath()
-  return new THREE.ShapeGeometry(shape)
+function earthTraceTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 512
+  canvas.height = 512
+  const ctx = canvas.getContext('2d')
+  const g = ctx.createRadialGradient(256, 256, 35, 256, 256, 248)
+  g.addColorStop(0, 'rgba(92,70,48,.24)')
+  g.addColorStop(.48, 'rgba(104,79,55,.14)')
+  g.addColorStop(.78, 'rgba(112,87,61,.06)')
+  g.addColorStop(1, 'rgba(112,87,61,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 512, 512)
+  for (let i = 0; i < 210; i++) {
+    const x = Math.random() * 512
+    const y = Math.random() * 512
+    const r = .4 + Math.random() * 2.1
+    ctx.fillStyle = `rgba(50,40,31,${0.012 + Math.random() * .025})`
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill()
+  }
+  return new THREE.CanvasTexture(canvas)
+}
+
+function hearthTraceTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 256
+  const ctx = canvas.getContext('2d')
+  const g = ctx.createRadialGradient(128, 128, 8, 128, 128, 118)
+  g.addColorStop(0, 'rgba(46,37,31,.30)')
+  g.addColorStop(.55, 'rgba(59,47,38,.14)')
+  g.addColorStop(1, 'rgba(59,47,38,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 256, 256)
+  return new THREE.CanvasTexture(canvas)
 }
 
 function buildEnvironment(scene) {
   const env = new THREE.Group()
   env.position.set(0, 0, -1.5)
 
-  const ground = new THREE.Mesh(
-    irregularPatchGeometry(1.6, 1.08),
-    new THREE.MeshStandardMaterial({color: 0x7f6a50, roughness: 1, metalness: 0, transparent: true, opacity: 0.9})
+  const earth = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.55, 1.65),
+    new THREE.MeshBasicMaterial({map: earthTraceTexture(), transparent: true, depthWrite: false, toneMapped: false})
   )
-  ground.rotation.x = -Math.PI / 2
-  ground.position.y = 0.004
-  env.add(ground)
+  earth.rotation.x = -Math.PI / 2
+  earth.position.y = .006
+  env.add(earth)
 
   const hearth = new THREE.Mesh(
-    new THREE.CircleGeometry(0.28, 28),
-    new THREE.MeshStandardMaterial({color: 0x3f342b, roughness: 1, transparent: true, opacity: 0.72})
+    new THREE.PlaneGeometry(.62, .42),
+    new THREE.MeshBasicMaterial({map: hearthTraceTexture(), transparent: true, depthWrite: false, toneMapped: false})
   )
   hearth.rotation.x = -Math.PI / 2
-  hearth.scale.set(1.2, 0.72, 1)
-  hearth.position.set(0.72, 0.011, 0.2)
+  hearth.position.set(.68, .009, .18)
+  hearth.rotation.z = .12
   env.add(hearth)
 
-  const stoneMat = new THREE.MeshStandardMaterial({color: 0x8d8171, roughness: 1, flatShading: true})
+  const stoneMat = new THREE.MeshStandardMaterial({color: 0x777168, roughness: 1, metalness: 0})
   ;[
-    [0.50, 0.055, 0.16, 0.08], [0.62, 0.05, 0.38, 0.075],
-    [0.82, 0.05, 0.38, 0.072], [0.94, 0.052, 0.18, 0.078],
-    [0.88, 0.05, -0.03, 0.07], [0.65, 0.05, -0.06, 0.075],
-  ].forEach(([x, y, z, s], i) => {
-    const stone = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), stoneMat)
-    stone.scale.y = 0.62
-    stone.rotation.y = i * 0.55
+    [.54, .027, .10, .045, 1.25, .52],
+    [.76, .025, .26, .04, 1.1, .48],
+    [.88, .023, .08, .036, 1.35, .45],
+  ].forEach(([x, y, z, s, sx, sy], i) => {
+    const stone = new THREE.Mesh(new THREE.SphereGeometry(s, 12, 8), stoneMat)
+    stone.scale.set(sx, sy, .9)
+    stone.rotation.y = i * .7
     stone.position.set(x, y, z)
     env.add(stone)
   })
 
-  const workStone = new THREE.Mesh(
-    new THREE.DodecahedronGeometry(0.24, 0),
-    new THREE.MeshStandardMaterial({color: 0x766b5e, roughness: 1, flatShading: true})
-  )
-  workStone.scale.set(1.35, 0.55, 1.0)
-  workStone.position.set(-0.48, 0.13, 0.36)
-  workStone.rotation.y = -0.45
-  env.add(workStone)
-
-  const flintMat = new THREE.MeshStandardMaterial({color: 0x51483e, roughness: 0.78, metalness: 0.02, flatShading: true})
+  const flintMat = new THREE.MeshStandardMaterial({color: 0x4d4842, roughness: .82, metalness: 0})
   ;[
-    [-0.18, 0.035, 0.34, 0.055], [-0.06, 0.035, 0.46, 0.045],
-    [-0.30, 0.035, 0.52, 0.05], [0.04, 0.035, 0.28, 0.042],
-    [-0.38, 0.035, 0.20, 0.048],
+    [-.23, .018, .26, .030], [-.08, .017, .38, .025],
+    [-.31, .017, .44, .026], [.02, .017, .25, .022],
+    [-.40, .017, .18, .024],
   ].forEach(([x, y, z, s], i) => {
     const flake = new THREE.Mesh(new THREE.TetrahedronGeometry(s, 0), flintMat)
-    flake.scale.set(1.65, 0.42, 0.78)
-    flake.rotation.set(0.2, i * 0.78, 0.16)
+    flake.scale.set(1.7, .28, .7)
+    flake.rotation.set(.08, i * .77, .12)
     flake.position.set(x, y, z)
     env.add(flake)
   })
 
-  const rawCore = new THREE.Mesh(new THREE.IcosahedronGeometry(0.095, 0), flintMat)
-  rawCore.scale.set(1.1, 0.8, 0.95)
-  rawCore.position.set(-0.63, 0.08, 0.08)
-  env.add(rawCore)
+  const core = new THREE.Mesh(new THREE.SphereGeometry(.055, 10, 7), flintMat)
+  core.scale.set(1.2, .75, .95)
+  core.position.set(-.52, .038, .12)
+  env.add(core)
 
   scene.add(env)
 }
@@ -303,12 +313,12 @@ function buildFigure(scene) {
 }
 
 const spatialModule = () => ({
-  name: 'krapina-spatial-chronovisor-v3',
+  name: 'krapina-spatial-chronovisor-v4',
   onStart: ({canvas}) => {
     const {scene, camera} = XR8.Threejs.xrScene()
     xrCamera = camera
-    scene.add(new THREE.HemisphereLight(0xe5e1d8, 0x4d4033, 1.25))
-    const sun = new THREE.DirectionalLight(0xfff1da, 0.68)
+    scene.add(new THREE.HemisphereLight(0xe5e1d8, 0x4d4033, 1.05))
+    const sun = new THREE.DirectionalLight(0xfff1da, 0.5)
     sun.position.set(-2, 4, 2)
     scene.add(sun)
     buildEnvironment(scene)
