@@ -130,8 +130,8 @@ function buildEnvironment() {
   backVegetation.renderOrder = 2
   world.add(backVegetation)
 
-  const rearMap = cropTexture(sourceVideo, {x: 0, y: .01, w: .48, h: .56}, 640, false)
-  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(5.05, 3.05), vegetationMaterial(rearMap, .72))
+  const rearMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .20, h: .72}, 640, true)
+  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(5.05, 3.05), vegetationMaterial(rearMap, .82))
   rearVegetation.position.set(-.2, 1.48, -.42)
   rearVegetation.renderOrder = 3
   world.add(rearVegetation)
