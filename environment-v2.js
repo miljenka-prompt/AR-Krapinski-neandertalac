@@ -26,6 +26,7 @@ let figure = null
 let packedVideo = null
 let sourceVideo = null
 let xrCamera = null
+let statusTimer = null
 const raycaster = new THREE.Raycaster()
 const pointer = new THREE.Vector2()
 const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
@@ -45,7 +46,15 @@ function media(src, muted = true) {
   return el
 }
 
-function setStatus(text) { if ($('status')) $('status').textContent = text }
+function setStatus(text, autoHideMs = 0) {
+  const status = $('status')
+  const card = document.querySelector('.status-card')
+  if (!status || !card) return
+  if (statusTimer) clearTimeout(statusTimer)
+  status.textContent = text
+  card.classList.remove('is-hidden')
+  if (autoHideMs > 0) statusTimer = setTimeout(() => card.classList.add('is-hidden'), autoHideMs)
+}
 
 function cropTexture(video, crop, size = 512, mirrorTile = false) {
   const canvas = document.createElement('canvas')
@@ -171,7 +180,7 @@ function placeAt(clientX, clientY, canvas) {
   world.position.copy(hit)
   world.visible = true
   $('placement-hint')?.classList.add('is-hidden')
-  setStatus(copy.placed)
+  setStatus(copy.placed, 1600)
 }
 
 const module = () => ({
@@ -187,9 +196,11 @@ const module = () => ({
   },
   onUpdate: () => {
     if (!figure || !xrCamera) return
-    const position = new THREE.Vector3()
-    figure.getWorldPosition(position)
-    figure.rotation.y = Math.atan2(xrCamera.position.x - position.x, xrCamera.position.z - position.z)
+    const localCamera = world.worldToLocal(xrCamera.position.clone())
+    figure.lookAt(localCamera)
+    figure.rotation.z = 0
+    const bottom = new THREE.Vector3(0, -1.31, 0).applyQuaternion(figure.quaternion)
+    figure.position.y = .018 - bottom.y
   },
 })
 
