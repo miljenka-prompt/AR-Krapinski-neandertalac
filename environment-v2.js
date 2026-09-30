@@ -196,7 +196,15 @@ const module = () => ({
 function start() {
   XR8.addCameraPipelineModules([XR8.GlTextureRenderer.pipelineModule(), XR8.Threejs.pipelineModule(), XR8.XrController.pipelineModule(), LandingPage.pipelineModule(), XRExtras.FullWindowCanvas.pipelineModule(), XRExtras.Loading.pipelineModule(), XRExtras.RuntimeError.pipelineModule(), module()])
   XR8.run({canvas: $('camerafeed')})
-  $('replace').addEventListener('click', () => { world.visible = false; $('placement-hint').classList.remove('is-hidden'); setStatus(copy.place) })
+  $('replace').addEventListener('click', () => {
+    packedVideo?.pause()
+    if (packedVideo) packedVideo.currentTime = 0
+    XR8.XrController.recenter()
+    world.visible = false
+    $('placement-hint').classList.remove('is-hidden')
+    $('video-toggle').textContent = copy.play
+    setStatus(copy.place)
+  })
   $('video-toggle').addEventListener('click', async () => {
     try {
       if (packedVideo.paused) { await packedVideo.play(); $('video-toggle').textContent = copy.pause }
