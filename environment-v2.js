@@ -203,14 +203,14 @@ const module = () => ({
   },
   onUpdate: () => {
     if (!figure || !xrCamera) return
-    const localCamera = world.worldToLocal(xrCamera.position.clone())
-    figure.lookAt(localCamera)
-    figure.rotation.z = 0
-    const bottom = new THREE.Vector3(0, -1.31, 0).applyQuaternion(figure.quaternion)
-    figure.position.y = .018 - bottom.y
+    const figureWorld = new THREE.Vector3()
+    figure.getWorldPosition(figureWorld)
+    const yaw = Math.atan2(xrCamera.position.x - figureWorld.x, xrCamera.position.z - figureWorld.z)
+    figure.rotation.set(0, yaw, 0)
+    figure.position.y = 1.31
     if (rearVegetation) {
-      rearVegetation.quaternion.copy(figure.quaternion)
-      const behind = new THREE.Vector3(0, .12, -.13).applyQuaternion(figure.quaternion)
+      rearVegetation.rotation.set(0, yaw, 0)
+      const behind = new THREE.Vector3(0, .17, -.16).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw)
       rearVegetation.position.copy(figure.position).add(behind)
     }
   },
