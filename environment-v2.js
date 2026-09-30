@@ -81,6 +81,15 @@ function featheredMaterial(map, opacity, vertical = false) {
   })
 }
 
+function vegetationMaterial(map, opacity) {
+  return new THREE.ShaderMaterial({
+    uniforms: {map: {value: map}, opacity: {value: opacity}},
+    vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader: 'uniform sampler2D map;uniform float opacity;varying vec2 vUv;void main(){vec4 c=texture2D(map,vUv);vec2 d=(vUv-.5)/.5;float radial=1.-smoothstep(.55,.95,length(d));float green=c.g-max(c.r,c.b)*.78;float foliage=smoothstep(.03,.19,green);float a=opacity*radial*foliage;if(a<.025)discard;gl_FragColor=vec4(c.rgb,a);}',
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
+  })
+}
+
 function packedMaterial(map) {
   return new THREE.ShaderMaterial({
     uniforms: {packedMap: {value: map}},
@@ -99,14 +108,14 @@ function buildEnvironment() {
   world.add(ground)
 
   const vegetationMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .25, h: .72}, 512, false)
-  const leftVegetation = new THREE.Mesh(new THREE.PlaneGeometry(2.25, 2.7), featheredMaterial(vegetationMap, .54, true))
-  leftVegetation.position.set(-1.45, 1.12, -1.05)
+  const leftVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.0), vegetationMaterial(vegetationMap, .78))
+  leftVegetation.position.set(-1.35, .82, -.95)
   leftVegetation.rotation.y = .28
   leftVegetation.renderOrder = 2
   world.add(leftVegetation)
 
-  const backVegetation = new THREE.Mesh(new THREE.PlaneGeometry(2.55, 2.45), featheredMaterial(vegetationMap, .38, true))
-  backVegetation.position.set(.95, 1.05, -1.65)
+  const backVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.85), vegetationMaterial(vegetationMap, .62))
+  backVegetation.position.set(.9, .76, -1.5)
   backVegetation.rotation.y = -.38
   backVegetation.renderOrder = 2
   world.add(backVegetation)
@@ -126,8 +135,8 @@ function build(scene) {
   packedTexture.magFilter = THREE.LinearFilter
   packedTexture.generateMipmaps = false
 
-  figure = new THREE.Mesh(new THREE.PlaneGeometry(5.15, 2.9), packedMaterial(packedTexture))
-  figure.position.set(-.2, 1.45, -.25)
+  figure = new THREE.Mesh(new THREE.PlaneGeometry(4.65, 2.62), packedMaterial(packedTexture))
+  figure.position.set(-.2, 1.31, -.25)
   figure.renderOrder = 4
   world.add(figure)
 
