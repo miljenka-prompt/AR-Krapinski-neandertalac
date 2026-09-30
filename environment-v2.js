@@ -104,7 +104,7 @@ function packedMaterial(map) {
   return new THREE.ShaderMaterial({
     uniforms: {packedMap: {value: map}},
     vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: 'uniform sampler2D packedMap;varying vec2 vUv;void main(){vec4 c=texture2D(packedMap,vec2(vUv.x*.5,vUv.y));float m=texture2D(packedMap,vec2(.5+vUv.x*.5,vUv.y)).r;float a=smoothstep(.045,1.,m*1.22);float hi=max(c.r,max(c.g,c.b));float lo=min(c.r,min(c.g,c.b));float lum=dot(c.rgb,vec3(.299,.587,.114));vec2 q=vec2((vUv.x-.69)/.14,(vUv.y-.12)/.11);float zone=1.-smoothstep(.65,1.,length(q));float pale=smoothstep(.58,.82,lum)*(1.-smoothstep(.08,.24,hi-lo));a*=1.-zone*pale;if(a<.01)discard;gl_FragColor=vec4(c.rgb,a);}',
+    fragmentShader: 'uniform sampler2D packedMap;varying vec2 vUv;void main(){vec4 c=texture2D(packedMap,vec2(vUv.x*.5,vUv.y));float m=texture2D(packedMap,vec2(.5+vUv.x*.5,vUv.y)).r;float a=smoothstep(.045,1.,m*1.22);vec2 q=vec2((vUv.x-.70)/.11,(vUv.y-.12)/.085);float artifact=1.-smoothstep(.58,1.,length(q));a*=1.-artifact;if(a<.01)discard;gl_FragColor=vec4(c.rgb,a);}',
     transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
   })
 }
