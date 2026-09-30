@@ -97,6 +97,19 @@ function buildEnvironment() {
   ground.renderOrder = 1
   world.add(ground)
 
+  const vegetationMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .25, h: .72}, 512, false)
+  const leftVegetation = new THREE.Mesh(new THREE.PlaneGeometry(2.25, 2.7), featheredMaterial(vegetationMap, .54, true))
+  leftVegetation.position.set(-1.45, 1.12, -1.05)
+  leftVegetation.rotation.y = .28
+  leftVegetation.renderOrder = 2
+  world.add(leftVegetation)
+
+  const backVegetation = new THREE.Mesh(new THREE.PlaneGeometry(2.55, 2.45), featheredMaterial(vegetationMap, .38, true))
+  backVegetation.position.set(.95, 1.05, -1.65)
+  backVegetation.rotation.y = -.38
+  backVegetation.renderOrder = 2
+  world.add(backVegetation)
+
 }
 
 function build(scene) {
@@ -112,8 +125,8 @@ function build(scene) {
   packedTexture.magFilter = THREE.LinearFilter
   packedTexture.generateMipmaps = false
 
-  figure = new THREE.Mesh(new THREE.PlaneGeometry(3.9, 2.2), packedMaterial(packedTexture))
-  figure.position.set(-.2, 1.1, -.25)
+  figure = new THREE.Mesh(new THREE.PlaneGeometry(5.15, 2.9), packedMaterial(packedTexture))
+  figure.position.set(-.2, 1.45, -.25)
   figure.renderOrder = 4
   world.add(figure)
 
