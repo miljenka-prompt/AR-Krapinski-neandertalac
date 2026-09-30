@@ -75,7 +75,7 @@ function featheredMaterial(map, opacity, vertical = false) {
   return new THREE.ShaderMaterial({
     uniforms: {map: {value: map}, opacity: {value: opacity}, vertical: {value: vertical ? 1 : 0}},
     vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: 'uniform sampler2D map;uniform float opacity;uniform float vertical;varying vec2 vUv;void main(){vec4 c=texture2D(map,vUv);vec2 d=(vUv-.5)/.5;float radial=1.-smoothstep(.68,1.,length(d));float rise=mix(1.,smoothstep(0.,.22,vUv.y),vertical);float a=opacity*radial*rise;if(a<.01)discard;gl_FragColor=vec4(c.rgb,a);}',
+    fragmentShader: 'uniform sampler2D map;uniform float opacity;uniform float vertical;varying vec2 vUv;void main(){vec4 c=texture2D(map,vUv);vec2 d=(vUv-.5)/.5;float n=sin(vUv.x*31.)*sin(vUv.y*27.)*.055+sin((vUv.x+vUv.y)*19.)*.04;float radial=1.-smoothstep(.48+n,.92+n,length(d));float rise=mix(1.,smoothstep(0.,.22,vUv.y),vertical);float a=opacity*radial*rise;if(a<.025)discard;gl_FragColor=vec4(c.rgb,a);}',
     transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
   })
 }
@@ -90,18 +90,13 @@ function packedMaterial(map) {
 }
 
 function buildEnvironment() {
-  const groundMap = cropTexture(sourceVideo, {x: .58, y: .56, w: .40, h: .40}, 512, true)
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 7.2), featheredMaterial(groundMap, .67))
+  const groundMap = cropTexture(sourceVideo, {x: .58, y: .56, w: .40, h: .40}, 512, false)
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2), featheredMaterial(groundMap, .58))
   ground.rotation.x = -Math.PI / 2
   ground.position.y = -.025
   ground.renderOrder = 1
   world.add(ground)
 
-  const shelterMap = cropTexture(sourceVideo, {x: .48, y: 0, w: .52, h: .88}, 512, false)
-  const shelter = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 2.6), featheredMaterial(shelterMap, .58, true))
-  shelter.position.set(1.35, 1.18, -1.65)
-  shelter.renderOrder = 2
-  world.add(shelter)
 }
 
 function build(scene) {
@@ -117,8 +112,8 @@ function build(scene) {
   packedTexture.magFilter = THREE.LinearFilter
   packedTexture.generateMipmaps = false
 
-  figure = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 1.75), packedMaterial(packedTexture))
-  figure.position.set(-.35, .875, -.35)
+  figure = new THREE.Mesh(new THREE.PlaneGeometry(3.9, 2.2), packedMaterial(packedTexture))
+  figure.position.set(-.2, 1.1, -.25)
   figure.renderOrder = 4
   world.add(figure)
 
