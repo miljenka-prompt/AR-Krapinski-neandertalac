@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="hr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111712">
+  <meta name="description" content="Eksperimentalni prostorni okoliš krapinskog neandertalca.">
+  <title>Grogu · Okoliš u stvarnom prostoru</title>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js" async crossorigin="anonymous" data-preload-chunks="slam"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/landing-page@1/dist/landing-page.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="./spatial.css?v=2">
+  <style>
+    .hint{position:fixed;left:50%;bottom:82px;z-index:20;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);padding:8px 12px;border-radius:999px;background:#07100ddd;color:#fff;font:700 12px/1.25 system-ui;text-align:center;transition:opacity .35s}
+    .hint.is-hidden{opacity:0;pointer-events:none}
+  </style>
+</head>
+<body>
+  <canvas id="camerafeed"></canvas>
+  <div id="hud">
+    <div class="top-row">
+      <a id="back-link" class="back" href="./">← Glavni demo</a>
+      <div id="mode-label" class="pill">BETA · HUŠNJAKOVO U PROSTORU</div>
+    </div>
+    <div class="status-card">
+      <strong id="scene-title">Grogu u okolišu Hušnjakova</strong>
+      <div id="status">Usmjeri kameru prema podu i dodirni mjesto za prizor.</div>
+    </div>
+    <div class="actions">
+      <button id="replace" type="button">Postavi ponovno</button>
+      <button id="video-toggle" type="button">Pokreni prizor i zvuk</button>
+    </div>
+  </div>
+  <div id="placement-hint" class="hint">Dodirni pod gdje želiš postaviti prizor</div>
+  <script type="module" src="./environment-v2.js?v=20260930a"></script>
+</body>
+</html>
