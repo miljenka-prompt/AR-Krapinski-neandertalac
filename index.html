@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="./styles.css?v=5">
   <link rel="stylesheet" href="./krapina-ui.css?v=1">
   <script defer src="./app.js?v=3"></script>
-  <script defer src="./krapina-ui.js?v=1"></script>
+  <script defer src="./krapina-ui.js?v=2"></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-defs" aria-hidden="true"><defs>
@@ -81,12 +81,15 @@
         <div class="actions">
           <button id="enterAR" class="primary" type="button"><svg><use href="#i-camera"/></svg><span data-i18n="openCamera">Otvori kameru</span></button>
           <a id="spatialLink" class="secondary" href="./spatial-v2.html" data-i18n="spatial">Prostorni kronovizor</a>
+          <a id="environmentLink" class="secondary" href="./environment-v2.html" data-i18n="environment">Krapinski neandertalac u svom okolišu</a>
           <button id="replay" class="secondary" type="button"><svg><use href="#i-reset"/></svg><span data-i18n="replay">Ponovi prizor</span></button>
         </div>
         <div class="mode-guide" aria-label="Kako prijeći u prostorni prikaz">
           <span class="guide-step" data-i18n="guide1">1 · Otvori kameru</span>
           <span class="guide-arrow" aria-hidden="true">→</span>
           <span class="guide-step" data-i18n="guide2">2 · Prostorni kronovizor</span>
+          <span class="guide-arrow" aria-hidden="true">→</span>
+          <span class="guide-step" data-i18n="guide3">3 · Neandertalac u svom okolišu</span>
         </div>
         <p class="support-hint" data-i18n-html="support"></p>
         <p id="status" class="status" role="status" aria-live="polite"></p>
