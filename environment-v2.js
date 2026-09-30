@@ -9,12 +9,12 @@ const lang = params.get('lang') === 'en' || (!params.get('lang') && localStorage
 const mode = params.get('mode') === 'visitor' ? 'visitor' : 'scientific'
 const COPY = {
   hr: {
-    page: 'Krapinski neandertalac · Okoliš u stvarnom prostoru', title: 'Krapinski neandertalac u okolišu Hušnjakova', mode: 'BETA · HUŠNJAKOVO U PROSTORU', back: '← Glavni demo',
+    page: 'Krapinski neandertalac u svom okolišu', title: 'Krapinski neandertalac u svom okolišu', mode: 'HUŠNJAKOVO · OKOLIŠ U PROSTORU', back: '← Glavni demo',
     place: 'Usmjeri kameru prema podu i dodirni mjesto za prizor.', placed: 'Prizor je postavljen. Dodirni drugdje za novo mjesto.', hint: 'Dodirni pod gdje želiš postaviti prizor',
     replace: 'Postavi ponovno', play: 'Pokreni prizor i zvuk', pause: 'Pauziraj prizor', blocked: 'Preglednik je blokirao reprodukciju. Dodirni tipku ponovno.', error: 'Prizor se nije učitao. Osvježi stranicu i pokušaj ponovno.',
   },
   en: {
-    page: 'Krapina Neanderthal · Environment in real space', title: 'Krapina Neanderthal in the Hušnjakovo environment', mode: 'BETA · HUŠNJAKOVO IN REAL SPACE', back: '← Main demo',
+    page: 'Krapina Neanderthal in his environment', title: 'Krapina Neanderthal in his environment', mode: 'HUŠNJAKOVO · ENVIRONMENT IN REAL SPACE', back: '← Main demo',
     place: 'Aim the camera at the floor and tap where you want the scene.', placed: 'Scene placed. Tap elsewhere to move it.', hint: 'Tap the floor to place the scene',
     replace: 'Place again', play: 'Start scene and sound', pause: 'Pause scene', blocked: 'Playback was blocked. Tap the button again.', error: 'The scene did not load. Refresh the page and try again.',
   },
