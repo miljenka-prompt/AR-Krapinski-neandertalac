@@ -26,6 +26,7 @@ let figure = null
 let packedVideo = null
 let sourceVideo = null
 let xrCamera = null
+let rearVegetation = null
 let statusTimer = null
 const raycaster = new THREE.Raycaster()
 const pointer = new THREE.Vector2()
@@ -129,6 +130,12 @@ function buildEnvironment() {
   backVegetation.renderOrder = 2
   world.add(backVegetation)
 
+  const rearMap = cropTexture(sourceVideo, {x: 0, y: .01, w: .48, h: .56}, 640, false)
+  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(5.05, 3.05), vegetationMaterial(rearMap, .72))
+  rearVegetation.position.set(-.2, 1.48, -.42)
+  rearVegetation.renderOrder = 3
+  world.add(rearVegetation)
+
 }
 
 function build(scene) {
@@ -201,6 +208,11 @@ const module = () => ({
     figure.rotation.z = 0
     const bottom = new THREE.Vector3(0, -1.31, 0).applyQuaternion(figure.quaternion)
     figure.position.y = .018 - bottom.y
+    if (rearVegetation) {
+      rearVegetation.quaternion.copy(figure.quaternion)
+      const behind = new THREE.Vector3(0, .12, -.13).applyQuaternion(figure.quaternion)
+      rearVegetation.position.copy(figure.position).add(behind)
+    }
   },
 })
 
