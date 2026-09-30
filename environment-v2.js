@@ -29,6 +29,7 @@ let xrCamera = null
 const raycaster = new THREE.Raycaster()
 const pointer = new THREE.Vector2()
 const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
+const MIN_PLACEMENT_DISTANCE = 1.8
 const $ = (id) => document.getElementById(id)
 
 function media(src, muted = true) {
@@ -145,6 +146,21 @@ function placeAt(clientX, clientY, canvas) {
   raycaster.setFromCamera(pointer, xrCamera)
   const hit = new THREE.Vector3()
   if (!raycaster.ray.intersectPlane(floorPlane, hit)) return
+  const dx = hit.x - xrCamera.position.x
+  const dz = hit.z - xrCamera.position.z
+  const distance = Math.hypot(dx, dz)
+  if (distance < MIN_PLACEMENT_DISTANCE) {
+    if (distance > .01) {
+      hit.x = xrCamera.position.x + (dx / distance) * MIN_PLACEMENT_DISTANCE
+      hit.z = xrCamera.position.z + (dz / distance) * MIN_PLACEMENT_DISTANCE
+    } else {
+      const facing = new THREE.Vector3(0, 0, -1).applyQuaternion(xrCamera.quaternion)
+      facing.y = 0
+      facing.normalize()
+      hit.x = xrCamera.position.x + facing.x * MIN_PLACEMENT_DISTANCE
+      hit.z = xrCamera.position.z + facing.z * MIN_PLACEMENT_DISTANCE
+    }
+  }
   world.position.copy(hit)
   world.visible = true
   $('placement-hint')?.classList.add('is-hidden')
