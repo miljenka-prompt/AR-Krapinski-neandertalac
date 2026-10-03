@@ -1,5 +1,9 @@
-Textures: Poly Haven, CC0; optimized to 512 px JPEG.
+# Portal forest assets
+
+All source assets CC0, Poly Haven.
+Pine Sapling Small — Rico Cilliers (modeling), Rob Tuytel (photography): https://polyhaven.com/a/pine_sapling_small
+Rock 07: https://polyhaven.com/a/rock_07
 Forest Ground 04 — Rob Tuytel, Rico Cilliers: https://polyhaven.com/a/forest_ground_04
-Bark Brown 01 — Rob Tuytel: https://polyhaven.com/a/bark_brown_01
-Rock Boulder Dry: https://polyhaven.com/a/rock_boulder_dry
-Geometry and foliage atlas are generated in code. Not a scanned forest or site reconstruction.
+Retained older v5 textures: Bark Brown 01, Rock Boulder Dry (Dimitrios Savva, Rico Cilliers).
+
+Pine GLB retains two variants, reduced to about 22k/26k triangles. Rock reduced to about 7.4k triangles. Textures resized to 512 px; GLBs use meshopt compression. Trees are modeled assets; rock is a scanned asset. This arrangement is a visual forest PoC, not a scientifically verified Pleistocene locality reconstruction.
