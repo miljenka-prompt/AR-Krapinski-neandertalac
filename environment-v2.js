@@ -110,8 +110,8 @@ function packedMaterial(map) {
 }
 
 function buildEnvironment() {
-  const groundMap = cropTexture(sourceVideo, {x: .58, y: .56, w: .40, h: .40}, 512, false)
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2), featheredMaterial(groundMap, .78))
+  const groundMap = cropTexture(sourceVideo, {x: .58, y: .56, w: .40, h: .40}, 1024, false)
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2), featheredMaterial(groundMap, .88))
   ground.rotation.x = -Math.PI / 2
   ground.position.y = -.025
   ground.renderOrder = 1
@@ -125,21 +125,21 @@ function buildEnvironment() {
   caveWall.renderOrder = 2
   world.add(caveWall)
 
-  const vegetationMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .25, h: .72}, 512, false)
-  const leftVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.0), vegetationMaterial(vegetationMap, .9))
+  const vegetationMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .32, h: .72}, 1024, false)
+  const leftVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.0), featheredMaterial(vegetationMap, .9, true))
   leftVegetation.position.set(-1.35, .82, -.95)
   leftVegetation.rotation.y = .28
   leftVegetation.renderOrder = 3
   world.add(leftVegetation)
 
-  const backVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.85), vegetationMaterial(vegetationMap, .84))
+  const backVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.85), featheredMaterial(vegetationMap, .86, true))
   backVegetation.position.set(.9, .76, -1.5)
   backVegetation.rotation.y = -.38
   backVegetation.renderOrder = 3
   world.add(backVegetation)
 
-  const rearMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .20, h: .72}, 640, true)
-  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(5.05, 3.05), vegetationMaterial(rearMap, .92))
+  const rearMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .34, h: .72}, 1024, false)
+  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(3.45, 3.05), featheredMaterial(rearMap, .92, true))
   rearVegetation.position.set(-.2, 1.48, -.42)
   rearVegetation.renderOrder = 4
   world.add(rearVegetation)
@@ -159,8 +159,8 @@ function build(scene) {
   packedTexture.magFilter = THREE.LinearFilter
   packedTexture.generateMipmaps = false
 
-  figure = new THREE.Mesh(new THREE.PlaneGeometry(4.65, 2.62), packedMaterial(packedTexture))
-  figure.position.set(-.2, 1.31, -.25)
+  figure = new THREE.Mesh(new THREE.PlaneGeometry(4.1, 2.31), packedMaterial(packedTexture))
+  figure.position.set(-.2, 1.14, -.25)
   figure.renderOrder = 5
   world.add(figure)
 
@@ -215,7 +215,7 @@ const module = () => ({
     figure.getWorldPosition(figureWorld)
     const yaw = Math.atan2(xrCamera.position.x - figureWorld.x, xrCamera.position.z - figureWorld.z)
     figure.rotation.set(0, yaw, 0)
-    figure.position.y = 1.31
+    figure.position.y = 1.14
     if (rearVegetation) {
       rearVegetation.rotation.set(0, yaw, 0)
       const behind = new THREE.Vector3(0, .17, -.16).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw)
