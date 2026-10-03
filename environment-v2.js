@@ -118,10 +118,10 @@ function buildEnvironment() {
   world.add(ground)
 
   // Stijenski zaklon iz desne polovice izvornog Kling kadra.
-  const caveMap = cropTexture(sourceVideo, {x: .43, y: .01, w: .55, h: .78}, 768, false)
-  const caveWall = new THREE.Mesh(new THREE.PlaneGeometry(3.15, 2.55), featheredMaterial(caveMap, .9, true))
-  caveWall.position.set(.78, 1.1, -1.35)
-  caveWall.rotation.y = -.22
+  const caveMap = cropTexture(sourceVideo, {x: .70, y: .01, w: .29, h: .78}, 768, false)
+  const caveWall = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 2.55), featheredMaterial(caveMap, .9, true))
+  caveWall.position.set(1.22, 1.1, -1.18)
+  caveWall.rotation.y = -.34
   caveWall.renderOrder = 2
   world.add(caveWall)
 
