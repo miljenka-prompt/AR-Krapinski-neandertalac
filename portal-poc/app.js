@@ -27,27 +27,28 @@ const top=new THREE.Mesh(new THREE.BoxGeometry(WIDTH+.18,.09,.12),frameMat);top.
 const pad=new THREE.Mesh(new THREE.PlaneGeometry(1.9,1.15),new THREE.MeshStandardMaterial({color:0x67717a,roughness:1}));pad.rotation.x=-Math.PI/2;pad.position.set(0,-.025,.5);pad.renderOrder=3;portal.add(pad);
 const sill=new THREE.Mesh(new THREE.BoxGeometry(WIDTH,.035,.16),frameMat);sill.position.set(0,.012,.03);sill.renderOrder=3;portal.add(sill);
 const reticle=new THREE.Mesh(new THREE.RingGeometry(.12,.15,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xbceef3,side:THREE.DoubleSide}));reticle.matrixAutoUpdate=false;reticle.visible=false;scene.add(reticle);
-let session=null,hitSource=null,lastHit=null,anchor=null,placed=false,pending=false,placementVersion=0,yaw=0,preview=false,frames=0,lastTime=0,fps=0;
+let xrAttempt=0,manualPose=null,session=null,hitSource=null,lastHit=null,anchor=null,placed=false,pending=false,placementVersion=0,yaw=0,preview=false,frames=0,lastTime=0,fps=0;
 const hitMatrix=new THREE.Matrix4(),tempPosition=new THREE.Vector3(),anchorPosition=new THREE.Vector3(),normal=new THREE.Vector3();
 function setStatus(t){$('status').textContent=t;}
-function clearPlacement(){placementVersion++;anchor?.delete();anchor=null;placed=false;pending=false;portal.visible=false;reticle.visible=false;lastHit=null;$('place').disabled=true;$('place').hidden=false;$('reset').hidden=true;setStatus('Polako pomakni kameru prema osvijetljenom podu.');}
+function clearPlacement(){placementVersion++;anchor?.delete();anchor=null;placed=false;pending=false;portal.visible=false;reticle.visible=false;lastHit=null;manualPose=null;$('place').textContent='Postavi portal';$('place').disabled=true;$('place').hidden=false;$('reset').hidden=true;setStatus('Polako pomakni kameru prema osvijetljenom podu.');}
 function endUI(){hitSource?.cancel();hitSource=null;anchor?.delete();anchor=null;session=null;placed=false;pending=false;placementVersion++;lastHit=null;portal.visible=false;reticle.visible=false;preview=false;document.body.className='';$('intro').hidden=false;$('hud').hidden=true;$('start').disabled=false;renderer.setClearColor(0x101d29,1);}
 async function startAR(){
  $('start').disabled=true;
  try{
-  const active=await navigator.xr.requestSession('immersive-ar',{requiredFeatures:['hit-test'],optionalFeatures:['anchors','dom-overlay'],domOverlay:{root:$('overlay')}});
+  const configs=[{optionalFeatures:['hit-test','anchors','dom-overlay'],domOverlay:{root:$('overlay')}},{optionalFeatures:['hit-test']},{}];
+  const active=await navigator.xr.requestSession('immersive-ar',configs[Math.min(xrAttempt,2)]);
   session=active;active.addEventListener('end',endUI,{once:true});document.body.className='ar';$('intro').hidden=true;$('hud').hidden=false;renderer.setClearColor(0x000000,0);clearPlacement();
   await renderer.xr.setSession(active);
-  const viewer=await active.requestReferenceSpace('viewer');hitSource=await active.requestHitTestSource({space:viewer});
+  try{const viewer=await active.requestReferenceSpace('viewer');hitSource=await active.requestHitTestSource({space:viewer});}catch{hitSource=null;setStatus('AR radi, ali detekcija poda nije dostupna. Položaj poda bit će procijenjen.');}
   active.addEventListener('select',()=>{if(!active.domOverlayState)placePortal();});
   if(!active.domOverlayState)setStatus('Naciljaj pod; dodir zaslona postavlja portal.');
- }catch(err){if(session){await session.end().catch(()=>{});}else endUI();$('support').textContent='AR nije pokrenut: '+err.message;}
+ }catch(err){if(session){await session.end().catch(()=>{});}else endUI();xrAttempt=Math.min(xrAttempt+1,2);$('start').textContent='Pokušaj jednostavnije AR pokretanje';$('support').textContent='AR konfiguracija '+xrAttempt+' odbijena ('+err.name+'): '+err.message+'. Otvori izbornik ⋮ pa Otvori u Chromeu i pokušaj ponovno. Ako i treći pokušaj ne uspije, ovaj uređaj/preglednik ne pruža traženi WebXR AR.';}
 }
 async function placePortal(){
- if(!lastHit||placed||pending||!session)return;
- pending=true;const version=placementVersion,active=session,hit=lastHit;tempPosition.setFromMatrixPosition(reticle.matrix);portal.position.copy(tempPosition);
+ if((!lastHit&&!manualPose)||placed||pending||!session)return;
+ pending=true;const version=placementVersion,active=session,hit=lastHit;if(hit)tempPosition.setFromMatrixPosition(reticle.matrix);else tempPosition.copy(manualPose);portal.position.copy(tempPosition);
  const viewerCamera=renderer.xr.getCamera();viewerCamera.getWorldPosition(anchorPosition);yaw=Math.atan2(anchorPosition.x-tempPosition.x,anchorPosition.z-tempPosition.z);portal.rotation.set(0,yaw,0);portal.visible=true;placed=true;reticle.visible=false;$('place').hidden=true;$('reset').hidden=false;setStatus('Portal postavljen. Pomakni telefon u stranu i približi ga otvoru.');
- try{if(typeof hit.createAnchor==='function'){const created=await hit.createAnchor();if(version!==placementVersion||session!==active){created.delete();return;}anchor=created;}}
+ try{if(hit&&typeof hit.createAnchor==='function'){const created=await hit.createAnchor();if(version!==placementVersion||session!==active){created.delete();return;}anchor=created;}}
  catch{anchor=null;}finally{if(version===placementVersion)pending=false;}
 }
 $('start').addEventListener('click',startAR);$('place').addEventListener('click',placePortal);$('reset').addEventListener('click',clearPlacement);$('exit').addEventListener('click',()=>session?session.end():endUI());
@@ -60,6 +61,7 @@ renderer.setAnimationLoop((time,frame)=>{
  if(preview){camera.position.set(Math.sin(azimuth)*3.4,1.55,Math.cos(azimuth)*3.4);camera.lookAt(0,1,-2);}
  if(frame&&session){
   const reference=renderer.xr.getReferenceSpace(),viewerPose=frame.getViewerPose(reference);
+  if(!placed&&!hitSource&&viewerPose){const vp=viewerPose.transform.position,vq=viewerPose.transform.orientation;const dir=new THREE.Vector3(0,0,-1).applyQuaternion(new THREE.Quaternion(vq.x,vq.y,vq.z,vq.w));dir.y=0;dir.normalize();manualPose=new THREE.Vector3(vp.x+dir.x*1.8,vp.y-1.4,vp.z+dir.z*1.8);$('place').disabled=false;$('place').textContent='Postavi na procijenjeni pod';setStatus('Bez detekcije poda: drži telefon oko 1,4 m iznad poda. Portal će biti 1,8 m ispred tebe.');}
   if(!placed&&hitSource){lastHit=null;reticle.visible=false;for(const hit of frame.getHitTestResults(hitSource)){const pose=hit.getPose(reference);if(!pose)continue;hitMatrix.fromArray(pose.transform.matrix);normal.set(0,1,0).transformDirection(hitMatrix);if(normal.y<.9)continue;reticle.matrix.copy(hitMatrix);reticle.visible=true;lastHit=hit;break;}$('place').disabled=!lastHit;if(lastHit)setStatus('Pod pronađen. Provjeri da je prsten na podu pa postavi portal.');else setStatus('Tražim pod. Polako pomakni kameru; pomažu svjetlo i vidljiva tekstura poda.');}
   if(placed&&anchor){const p=frame.getPose(anchor.anchorSpace,reference);portal.visible=!!p&&!!viewerPose;if(p)portal.position.setFromMatrixPosition(hitMatrix.fromArray(p.transform.matrix));}else if(placed)portal.visible=!!viewerPose;
   if(placed&&!viewerPose)setStatus('Praćenje izgubljeno. Polako vrati kameru prema poznatom dijelu sobe.');
