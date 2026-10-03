@@ -1,11 +1,7 @@
-# Pleistocene Portal PoC
+# Isolated portal PoC v4
 
-Standalone Android WebXR immersive-ar test. No Grog, video, existing spatial code, 8th Wall code or existing repository was changed.
+XR8 browser SLAM using the same engine stack as spatial-v2. No ARCore requirement. No edits outside portal-poc.
 
-## Test
-Open deployed HTTPS URL directly in Android Chrome. Start AR, find a textured horizontal floor and place the portal. Move sideways and toward the opening. Foreground stones should shift more than distant trees; the frame should remain at its placement. Reset and try another location. Diagnostics distinguish XRAnchor from local-reference placement.
+A fixed upright aperture clips interior fragments by intersecting each camera ray with the portal plane. Camera movement gives geometric parallax. Phone starts at an assumed height of 1.4 in responsive XR8 coordinates; placement intersects the center camera ray with y=0. This is an estimated reference floor, not detected floor or an XRAnchor. Dimensions are approximate. Stay in front of the portal.
 
-The scene is stylized procedural geometry, not a reconstruction of a named site. Vertical 1.35 × 2.05 m stencil aperture; floor pad; genuine depth layers. No video/images/AI or network APIs. Three.js 0.183.2 loads from jsDelivr (MIT); network access is required to load the engine. Camera handling belongs to WebXR; app records/uploads nothing.
-
-## Limits
-Requires Android/Chrome/ARCore-compatible device; Redmi compatibility must be measured, not assumed. Anchors optional; local reference still tracks 6DoF but drift may differ. Ground hit test does not classify floor vs table: user confirms ring is on floor. No real-world depth occlusion or traversal through portal; stay in front. Private hosting/login must allow top-level immersive-ar. Preview does not test AR. No persistent anchors after reload.
+Scenery is placeholder geometry for tracking tests, not a realistic forest. Physical-device camera, drift, and depth tests are pending. The previous native WebXR app.js remains archived and is not loaded by index.html.
