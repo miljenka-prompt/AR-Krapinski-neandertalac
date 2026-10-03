@@ -95,7 +95,7 @@ function backgroundMaterial(map, opacity) {
   return new THREE.ShaderMaterial({
     uniforms: {map: {value: map}, opacity: {value: opacity}},
     vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: 'uniform sampler2D map;uniform float opacity;varying vec2 vUv;void main(){vec4 c=texture2D(map,vUv);vec2 edge=smoothstep(vec2(0.),vec2(.055),vUv)*smoothstep(vec2(0.),vec2(.055),1.-vUv);float a=opacity*edge.x*edge.y;if(a<.02)discard;gl_FragColor=vec4(c.rgb,a);}',
+    fragmentShader: 'uniform sampler2D map;uniform float opacity;varying vec2 vUv;void main(){vec4 c=texture2D(map,vUv);vec2 d=abs((vUv-.5)/.5);float shape=pow(pow(d.x,6.)+pow(d.y,6.),1./6.);float n=sin(vUv.x*29.+sin(vUv.y*17.))*sin(vUv.y*23.)*.035+sin((vUv.x+vUv.y)*41.)*.018;float blend=1.-smoothstep(.66+n,1.+n,shape);float a=opacity*blend;if(a<.012)discard;gl_FragColor=vec4(c.rgb,a);}',
     transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
   })
 }
