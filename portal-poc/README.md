@@ -1,9 +1,5 @@
-# Isolated XR8 portal v6
+# Isolated portal v7 — source-video environment
 
-XR8 camera startup and estimated reference floor placement retained. Changes only under portal-poc. V4/V5 scripts remain; v5.html retains the previous tested page.
+User-uploaded Krapina_Neanderthal.mp4, frame at 0.8 s. ImageGen precise-object edit removes the figure; the occluded region is synthesized. Source video remains unchanged. The cleaned frame maps to a subdivided relief surface with artist-estimated depth, not reconstructed depth. Foreground uses image-projected ground and three real 3D rocks. Closed far sphere fills the background. This is 2.5D + 3D; limited lateral movement, no faithful unseen surfaces or disocclusion reconstruction.
 
-GLTFLoader with MeshoptDecoder loads local compressed CC0 pine and rock models (approximately 1.6 MB). Two modeled pine variants and one scanned rock are arranged in 3D. Flat grass removed. Water surface normals animate. Terrain flattens at the threshold to close the near edge gap. Compact inline controls.
-
-Camera uses initial assumed height 1.4 in responsive XR8 coordinates. This is not detected floor, exact metric scaling, or XRAnchor. Stay in front of the aperture. Physical-device performance and v6 visual test pending.
-
-Composition: open river valley with eight pine trees in scattered groups and a distant continuous ridge. Artistic Pleistocene-inspired environment; no specific time/place or scientific reconstruction claimed.
+XR8 camera and floor placement retained. Changes only in portal-poc. v5.html and v6.html retain prior pages. Physical-device visuals and speed pending.
