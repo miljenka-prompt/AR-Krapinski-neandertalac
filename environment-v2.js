@@ -82,6 +82,24 @@ function cropTexture(video, crop, size = 512, mirrorTile = false) {
   return texture
 }
 
+function staticTexture(url) {
+  const texture = new THREE.TextureLoader().load(url)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.anisotropy = 8
+  return texture
+}
+
+function backgroundMaterial(map, opacity) {
+  return new THREE.ShaderMaterial({
+    uniforms: {map: {value: map}, opacity: {value: opacity}},
+    vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader: 'uniform sampler2D map;uniform float opacity;varying vec2 vUv;void main(){vec4 c=texture2D(map,vUv);vec2 edge=smoothstep(vec2(0.),vec2(.055),vUv)*smoothstep(vec2(0.),vec2(.055),1.-vUv);float a=opacity*edge.x*edge.y;if(a<.02)discard;gl_FragColor=vec4(c.rgb,a);}',
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
+  })
+}
+
 function featheredMaterial(map, opacity, vertical = false) {
   return new THREE.ShaderMaterial({
     uniforms: {map: {value: map}, opacity: {value: opacity}, vertical: {value: vertical ? 1 : 0}},
@@ -111,39 +129,18 @@ function packedMaterial(map) {
 
 function buildEnvironment() {
   const groundMap = cropTexture(sourceVideo, {x: .58, y: .56, w: .40, h: .40}, 1024, false)
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2), featheredMaterial(groundMap, .88))
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(4.35, 4.35), featheredMaterial(groundMap, .9))
   ground.rotation.x = -Math.PI / 2
   ground.position.y = -.025
   ground.renderOrder = 1
   world.add(ground)
 
-  // Stijenski zaklon iz desne polovice izvornog Kling kadra.
-  const caveMap = cropTexture(sourceVideo, {x: .70, y: .01, w: .29, h: .78}, 768, false)
-  const caveWall = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 2.55), featheredMaterial(caveMap, .9, true))
-  caveWall.position.set(1.22, 1.1, -1.18)
-  caveWall.rotation.y = -.34
-  caveWall.renderOrder = 2
-  world.add(caveWall)
-
-  const vegetationMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .32, h: .72}, 1024, false)
-  const leftVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.0), featheredMaterial(vegetationMap, .9, true))
-  leftVegetation.position.set(-1.35, .82, -.95)
-  leftVegetation.rotation.y = .28
-  leftVegetation.renderOrder = 3
-  world.add(leftVegetation)
-
-  const backVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.85), featheredMaterial(vegetationMap, .86, true))
-  backVegetation.position.set(.9, .76, -1.5)
-  backVegetation.rotation.y = -.38
-  backVegetation.renderOrder = 3
-  world.add(backVegetation)
-
-  const rearMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .34, h: .72}, 1024, false)
-  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(3.45, 3.05), featheredMaterial(rearMap, .92, true))
-  rearVegetation.position.set(-.2, 1.48, -.42)
-  rearVegetation.renderOrder = 4
+  // Jedinstvena pozadina uklanja praznine uz Groga i rastegnute bočne izreze.
+  const backgroundMap = staticTexture('./assets/environment-v2/grog-background-v1.webp?v=20261003u')
+  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(4.55, 2.56), backgroundMaterial(backgroundMap, .97))
+  rearVegetation.position.set(-.2, 1.26, -.62)
+  rearVegetation.renderOrder = 3
   world.add(rearVegetation)
-
 }
 
 function build(scene) {
@@ -218,7 +215,7 @@ const module = () => ({
     figure.position.y = 1.14
     if (rearVegetation) {
       rearVegetation.rotation.set(0, yaw, 0)
-      const behind = new THREE.Vector3(0, .17, -.16).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw)
+      const behind = new THREE.Vector3(0, .12, -.38).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw)
       rearVegetation.position.copy(figure.position).add(behind)
     }
   },
