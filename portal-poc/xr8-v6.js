@@ -26,12 +26,12 @@ function interiorMaterial(color){return clipMaterial(new THREE.MeshStandardMater
 
 async function build(){
 scene.add(new THREE.HemisphereLight(0xc9dbdf,0x3b3926,1.65));
-const sun=new THREE.DirectionalLight(0xffe9ca,2.1);sun.position.set(-8,12,6);scene.add(sun);
+const sun=new THREE.DirectionalLight(0xe5eced,1.6);sun.position.set(-8,12,6);scene.add(sun);
 portal=new THREE.Group();portal.visible=false;scene.add(portal);
 function terrain(x,z){const fade=Math.min(1,Math.max(0,(-z-.12)/1.2));const cx=1.35+Math.sin(z*.2)*.8;const channel=Math.max(0,1-Math.abs(x-cx)/.7);return -.025+fade*(Math.sin(x*.58+z*.22)*.065+Math.sin(z*.65)*.025-channel*.13);}
 const loader=new THREE.TextureLoader();
 function texture(name,repeatX,repeatY){const t=loader.load('assets/'+name+'.jpg',()=>{$('textures').textContent='Teksture učitane.';},undefined,()=>{$('textures').textContent='Dio tekstura se nije učitao. Osvježi stranicu.';});t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeatX,repeatY);return t;}
-const groundMat=clipMaterial(new THREE.MeshStandardMaterial({map:texture('ground',10,14),color:0xa4aa87,roughness:1}));
+const groundMat=clipMaterial(new THREE.MeshStandardMaterial({map:texture('ground',10,14),color:0xc3bd9f,roughness:1}));
 const barkMat=clipMaterial(new THREE.MeshStandardMaterial({map:texture('bark',1,3),color:0xaca998,roughness:1}));
 const rockMat=clipMaterial(new THREE.MeshStandardMaterial({map:texture('rock',1,1),color:0xa7ada6,roughness:1}));
 function mesh(geometry,material,x=0,y=0,z=0){const m=new THREE.Mesh(geometry,material);m.position.set(x,y,z);m.renderOrder=2;portal.add(m);return m;}
@@ -47,7 +47,7 @@ function modelAt(source,x,z,height,rotation){const wrapper=new THREE.Group(),obj
  wrapper.scale.setScalar(height/size.y);wrapper.rotation.y=rotation;wrapper.position.set(x,terrain(x,z),z);portal.add(wrapper);return wrapper;}
 const variants=pine.scene.children;
 // Asymmetric clusters frame a clear stream and a view into the distance.
-const trees=[[-2.3,-3.8,6.2],[2.7,-4.8,7.3],[-3.8,-6.3,8],[3.9,-8.2,8.5],[-1.8,-9.2,6.5],[-5.1,-9.5,8.6],[5.5,-11,9],[-3.6,-13,8],[2.5,-14.5,7.5],[-6,-16,8.7],[5.1,-17.8,8.2],[-2,-19,7.8],[2.9,-22,8.5],[-5.3,-23.5,9],[5.4,-25,9.2],[-1.6,-27,8],[2.4,-30,8.6],[-5.4,-32,9]];
+const trees=[[-2.8,-4.2,6.7],[3.6,-6.3,7.5],[-4.5,-10,8.2],[5,-12.5,7.8],[-5.4,-19,8.7],[4.4,-21.5,8.2],[-3.7,-27,8.5],[6,-29,8.8]];
 for(let i=0;i<trees.length;i++){const [x,z,h]=trees[i];modelAt(variants[i%variants.length],x,z,h,rnd()*Math.PI*2);}
 const rocks=[[-.55,-.75,.32],[.8,-2.1,.25],[-1.3,-4.8,.47],[2.4,-5.5,.35],[-3.3,-8,.3],[.3,-8.4,.24],[2.5,-11,.36],[-2.9,-15,.5],[1.9,-17.6,.38]];
 for(const [x,z,h] of rocks)modelAt(rock.scene,x,z,h,rnd()*Math.PI*2);
@@ -64,6 +64,10 @@ waterMat.onBeforeCompile=shader=>{clipWater(shader);shader.uniforms.waterTime=wa
  normal=normalize(normal+vec3(rippleA*.12,rippleB*.08,0.0));
  `);};waterMat.customProgramCacheKey=()=> 'portal-water-v6';mesh(sg,waterMat);
 window.portalWaterClock=waterClock;
+// A continuous smooth distant ridge, avoiding repeated cone mountains.
+const ridge=new THREE.PlaneGeometry(45,9,90,12),rp=ridge.attributes.position;
+for(let i=0;i<rp.count;i++){const x=rp.getX(i),y=rp.getY(i),t=(y+4.5)/9;const crest=3.2+Math.sin(x*.16)*1.7+Math.sin(x*.39)*.7;rp.setY(i,-.5+t*crest);rp.setZ(i,-37-Math.sin(x*.23)*1.1);}
+ridge.computeVertexNormals();mesh(ridge,clipMaterial(new THREE.MeshStandardMaterial({color:0x81918f,roughness:1,side:THREE.DoubleSide})),0,0,0);
 const skyCanvas=document.createElement('canvas');skyCanvas.width=16;skyCanvas.height=256;const ctx=skyCanvas.getContext('2d'),gradient=ctx.createLinearGradient(0,0,0,256);gradient.addColorStop(0,'#738d99');gradient.addColorStop(.65,'#bec9c3');gradient.addColorStop(1,'#7c9081');ctx.fillStyle=gradient;ctx.fillRect(0,0,16,256);
 const skyTexture=new THREE.CanvasTexture(skyCanvas);skyTexture.colorSpace=THREE.SRGBColorSpace;mesh(new THREE.PlaneGeometry(44,22),clipMaterial(new THREE.MeshBasicMaterial({map:skyTexture})),0,8,-42);
 const frameMat=new THREE.MeshStandardMaterial({color:0x6f7974,roughness:.8});
