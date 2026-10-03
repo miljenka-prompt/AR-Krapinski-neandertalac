@@ -1,5 +1,2 @@
-# Isolated portal v7 — source-video environment
-
-User-uploaded Krapina_Neanderthal.mp4, frame at 0.8 s. ImageGen precise-object edit removes the figure; the occluded region is synthesized. Source video remains unchanged. The cleaned frame maps to a subdivided relief surface with artist-estimated depth, not reconstructed depth. Foreground uses image-projected ground and three real 3D rocks. Closed far sphere fills the background. This is 2.5D + 3D; limited lateral movement, no faithful unseen surfaces or disocclusion reconstruction.
-
-XR8 camera and floor placement retained. Changes only in portal-poc. v5.html and v6.html retain prior pages. Physical-device visuals and speed pending.
+# Isolated portal v8
+True 3D shelter: elliptical rock shell with inner/outer surfaces, thick front rim and closed back. Continuous 3D terrain. Real 3D pine and scanned rock assets; user frame restricted to distant forest portion, no source cliff mapped to near geometry. No warped full-frame relief remains. Shape is designed, not recovered/measured from video. XR8 camera/reference-floor placement retained. Previous page v7-2.html preserved. Physical-device visual test pending. Changes only under portal-poc.
