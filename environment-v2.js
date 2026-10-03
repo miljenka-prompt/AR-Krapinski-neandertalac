@@ -111,29 +111,37 @@ function packedMaterial(map) {
 
 function buildEnvironment() {
   const groundMap = cropTexture(sourceVideo, {x: .58, y: .56, w: .40, h: .40}, 512, false)
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2), featheredMaterial(groundMap, .58))
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2), featheredMaterial(groundMap, .78))
   ground.rotation.x = -Math.PI / 2
   ground.position.y = -.025
   ground.renderOrder = 1
   world.add(ground)
 
+  // Stijenski zaklon iz desne polovice izvornog Kling kadra.
+  const caveMap = cropTexture(sourceVideo, {x: .43, y: .01, w: .55, h: .78}, 768, false)
+  const caveWall = new THREE.Mesh(new THREE.PlaneGeometry(3.15, 2.55), featheredMaterial(caveMap, .9, true))
+  caveWall.position.set(.78, 1.1, -1.35)
+  caveWall.rotation.y = -.22
+  caveWall.renderOrder = 2
+  world.add(caveWall)
+
   const vegetationMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .25, h: .72}, 512, false)
-  const leftVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.0), vegetationMaterial(vegetationMap, .78))
+  const leftVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.0), vegetationMaterial(vegetationMap, .9))
   leftVegetation.position.set(-1.35, .82, -.95)
   leftVegetation.rotation.y = .28
-  leftVegetation.renderOrder = 2
+  leftVegetation.renderOrder = 3
   world.add(leftVegetation)
 
-  const backVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.85), vegetationMaterial(vegetationMap, .62))
+  const backVegetation = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.85), vegetationMaterial(vegetationMap, .84))
   backVegetation.position.set(.9, .76, -1.5)
   backVegetation.rotation.y = -.38
-  backVegetation.renderOrder = 2
+  backVegetation.renderOrder = 3
   world.add(backVegetation)
 
   const rearMap = cropTexture(sourceVideo, {x: 0, y: .02, w: .20, h: .72}, 640, true)
-  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(5.05, 3.05), vegetationMaterial(rearMap, .82))
+  rearVegetation = new THREE.Mesh(new THREE.PlaneGeometry(5.05, 3.05), vegetationMaterial(rearMap, .92))
   rearVegetation.position.set(-.2, 1.48, -.42)
-  rearVegetation.renderOrder = 3
+  rearVegetation.renderOrder = 4
   world.add(rearVegetation)
 
 }
@@ -153,7 +161,7 @@ function build(scene) {
 
   figure = new THREE.Mesh(new THREE.PlaneGeometry(4.65, 2.62), packedMaterial(packedTexture))
   figure.position.set(-.2, 1.31, -.25)
-  figure.renderOrder = 4
+  figure.renderOrder = 5
   world.add(figure)
 
   sourceVideo.addEventListener('loadedmetadata', () => { sourceVideo.currentTime = .4 }, {once: true})
